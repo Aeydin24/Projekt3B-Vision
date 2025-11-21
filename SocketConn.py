@@ -10,7 +10,7 @@ class sockConn:
         s.connect((self.robotIP, self.port))
         s.send(command.encode())
         s.close()
-        print("Script Command Complete")
+        print("Script Command Complete!")
 
     def build_command(self, moves: list) -> str:
         cmd = ''
