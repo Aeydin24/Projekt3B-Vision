@@ -43,6 +43,7 @@ class AnalyzeState(State):
         # ---------- Show frame ----------
         
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        self.ctrl.objectDict.clear()
         
 
     
@@ -55,36 +56,22 @@ class AnalyzeState(State):
             for sq in squares:
                 cv2.polylines(frame, [sq], True, (255,0,0), 2)
 
-                # Find center
                 M = sq.reshape(4,2)
                 cx = int(np.mean(M[:,0]))
                 cy = int(np.mean(M[:,1]))
-                r = 20  # lille ROI
+                r = 20
 
                 dominant = self.detectColors(frame, cx, cy, r)
 
-                objectList = {
+                objectDict = {
                     "shape": "square",
                     "x": cx,
                     "y": cy,
                     "color": dominant
-                }
-                self.ctrl.objectList.append(objectList)
-            #----------- draw rectangle ---------
-            cv2.polylines(frame, [sq], True, (255,0,0), 2)   
-            # -----------Find color square------- 
-            dominant = self.detectColors(frame, x, y, r)
-            # -----------write color -----------
-            cv2.putText(frame, dominant, (x - w, y - h - 10),(0,255,255),2)
+         }
+                self.ctrl.objectDict.append(objectDict)
+
             
-            objectList = {
-                "shape": "square",
-                "x": x, 
-                "y": y, 
-                "w": w,
-                "h": h,
-                "color": dominant
-            }
             
 
         #---------- Find circles ------------
@@ -95,7 +82,7 @@ class AnalyzeState(State):
             circles = np.uint16(np.around(circles))
 
             for c in circles[0, :]:
-                x, y, r,  = c[0], c[1], c[2],
+                x, y, r,  = c[0], c[1], c[2]
                 x =int(x)
                 y =int(y)
                 w =int(r)
@@ -111,7 +98,7 @@ class AnalyzeState(State):
                 cv2.putText(frame, dominant, (x - r, y - r - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
                 
-                objectdict = {
+                objectDict = {
                     "shape": "circle",
                     "x": x, 
                     "y": y, 
@@ -119,7 +106,7 @@ class AnalyzeState(State):
                     "color": dominant
                     }
                 
-                self.ctrl.objectList.append(objectdict)
+                self.ctrl.objectDict.append(objectDict)
                                         
                 
 
@@ -143,32 +130,32 @@ class AnalyzeState(State):
     
             blur, cv2.HOUGH_GRADIENT, 
             dp=1, 
-            minDist=100,
-            minRadius=90,
-            maxRadius=100,
+            minDist=120,
+            minRadius= self.ctrl.cirleMinDim,
+            maxRadius= self.ctrl.cirleMaxDim,
             param1=10,
             param2=40
         )
         return circles
     #---------- SQUARE DETECTION ----------
     def detect_squares(self, frame_gray):
-        blur = cv2.GaussianBlur(frame_gray, (5,5), 2) #??
-        edges = cv2.Canny(blur,50,150,apertureSize = 3) # ???
+        blur = cv2.GaussianBlur(frame_gray, (3,3), 2) # reducer blur hvis den fanger for meget
+        edges = cv2.Canny(blur,100,150,apertureSize = 3) # ?gør det 
         countours, _= cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)# find contours ???
         squares = []
 
         for cnt in countours:
-            epsilon = 0.05 * cv2.arcLength(cnt, True)
+            epsilon = 0.05 * cv2.arcLength(cnt, True) # præsion af polygon
             approx = cv2.approxPolyDP(cnt, epsilon, True)
 
             # check polygon with 4 corners
             if len(approx) == 4:
                 # område skal være større end lidt støj
                 area = cv2.contourArea(approx)
-                if area > 200:  
+                if area > 1500:              # min area
                     squares.append(approx)
 
-            return squares
+        return squares
        
     
     
@@ -212,7 +199,7 @@ class MovingState(State):
         self.controller = controller
 
         print(f"{self.stateMess} : {self.__class__.__name__}")
-        print("self.ctrl.objectList:", self.controller.objectList)
+        print("self.ctrl.objectDict:", self.controller.objectDict)
 
     def Enter(self):
             pass
@@ -252,7 +239,9 @@ class Controller(StateMachine):
     def __init__(self, use_oak=False):
         self.running = True
         self.use_oak = use_oak
-        self.objectdict = []
+        self.objectDict = []
+        self.cirleMaxDim = 90
+        self.cirleMinDim = 70
 
         if self.use_oak:
             print("Starter OAK-D pipeline...")
