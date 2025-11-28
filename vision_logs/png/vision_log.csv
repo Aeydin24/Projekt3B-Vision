@@ -1,0 +1,2 @@
+ID;Timestamp;H_min;H_max;S_min;S_max;V_min;V_max;Canny_min;Canny_max;ImagePath;Comment
+VISION_001;2025-11-19 18:00:13;37;57;143;255;24;144;50;150;VISION_001.png;test af  logging
