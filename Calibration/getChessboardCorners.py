@@ -4,7 +4,7 @@ import numpy as np
 objp = np.zeros((6 * 9, 3), np.float32)
 objp[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
 
-img = cv2.imread("camera.png")
+img = cv2.imread("homographyImage.png")
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 ret, corners = cv2.findChessboardCorners(gray, (9, 6), None)
