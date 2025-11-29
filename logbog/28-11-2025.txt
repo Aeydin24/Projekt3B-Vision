@@ -1,0 +1,28 @@
+Magnus 28-11-2025
+
+Har oprettet den her logbog som jeg syntes vi skal prøve at benytte os af så det er nemere for os alle sammen at forstå
+hvad der er blevet lavet af ændreing og hvad man har af tanker.
+
+det som ligger i captured_images er ikke nogen billeder der er vigtige lige nu og kan derfor slettes hvis man ikke vil se på benjamin xD
+men tænkte vi kunne bruge nogen af dem til rapport da det viser hvad vi gjorde under kaliberings processen.
+
+Jeg har kommentert en god sjat af koden, det skal dog ses som noter til os selv hvad vi kan huske at gøre bedre plus lidt forklaring
+så vi alle sammen er på samme bølge længde.
+Rigtig kommentar der skal forblive er skrevet i engelsk
+
+Jeg har oprettet den her Dev brach fra den nyeste main da den gamle development brach var en god sjat versioner bag main.
+Jeg tilader mig derfor også at commit til main braches, syntes vi skal prøve fra nu af at holde vores udvikling i den her brach så
+længe det giver mening. hvis det er en hel ny feature eller ny kalibering metode så kan vi brach ud.
+
+Vores kommunikation til og fra roboten sker via rtde med robot i remote control.
+
+programmerne er en blanding af chat special, eksemple kode der er stykket sammen og lidt knofedt. så vi må lige check for fejl.
+Har prøvet at holde det helt low down to earth isæt i vision/robotToOject.py så det er nemt at bygge vidre på.
+Kunne være fedt hvis i kunne prøve at få lavet state machine og flet det sammen, samt som beskrevet rundt omkring i programmerne lige
+få de sidste par ting fixet og implementert. syntes fokus først skal være at vi laver vores 2 kæmpe arrys om til 1 eller 2 npz filer
+så det ikke fylder så meget. Kig i captureRobotAndImage.py der gør vi det faktisk.
+
+MEGET VIGTIGT!!!
+det som ligger i captured_poses_npz MÅ IKKE SLETTES!
+calibratinImage.png MÅ IKKE SLETTES!
+mappe struktur i calibration mappen MÅ IKKE ÆNDRES!

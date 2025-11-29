@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#Brug det her script til at verificere robot kalibrering. kør findHomography først brug pixel sæt fra et kendt punkt og se om robotten kan nå det
+#Det her er kun lavet for at vi kan hurtigt lige manualt kan teste vores kalibrerig.
 import time
 
 import rtde_control

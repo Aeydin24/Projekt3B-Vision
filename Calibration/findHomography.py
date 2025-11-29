@@ -1,62 +1,37 @@
 import numpy as np
 import cv2
 
-# Example: 4 known correspondences
+# syntes vi skal se om vi ikke kan lave det her om til en npz file så vi bare kan load det ind i stedet for at det basicly er hardcodet
+# og det fylder hjernet dødt meget. det burde være forholdsvist simpelt at lave om til en npz file.
+# camera chessboard image points (2D) xy in pixels
 image_points = np.array([
- [269.20438, 231.23853],
-
- [282.9418,  231.40858],
-
- [296.31116, 231.70386],
-
- [309.9476,  232.38803],
-
- [323.8921,  232.57532],
-
- [337.60565, 232.75604],
-
- [351.3533,  233.22455],
-
- [365.01834, 233.60591],
-
- [378.67422, 233.7799 ],
-
- [268.841,   244.78584],
-
- [282.4767,  245.30753],
-
- [296.24783, 245.46617],
-
- [309.68488, 245.74896],
-
- [323.53073, 246.2915 ],
-
- [337.2779,  246.68903],
-
- [350.79984, 247.12007],
-
- [364.67224, 247.39052],
-
- [378.59515, 247.61728],
-
- [268.43887, 258.54147],
-
- [282.13168, 258.77237],
-
- [295.53882, 259.06018],
-
- [309.52545, 259.63516],
-
- [323.3153,  260.05283],
-
- [336.7843,  260.45132],
-
- [350.52014, 260.5951 ],
-
- [364.50082, 260.87234],
-
- [378.23056, 261.40582],
-
+    [269.20438, 231.23853],
+    [282.9418,  231.40858],
+    [296.31116, 231.70386],
+    [309.9476,  232.38803],
+    [323.8921,  232.57532],
+    [337.60565, 232.75604],
+    [351.3533,  233.22455],
+    [365.01834, 233.60591],
+    [378.67422, 233.7799 ],
+    [268.841,   244.78584],
+    [282.4767,  245.30753],
+    [296.24783, 245.46617],
+    [309.68488, 245.74896],
+    [323.53073, 246.2915 ],
+    [337.2779,  246.68903],
+    [350.79984, 247.12007],
+    [364.67224, 247.39052],
+    [378.59515, 247.61728],
+    [268.43887, 258.54147],
+    [282.13168, 258.77237],
+    [295.53882, 259.06018],
+    [309.52545, 259.63516],
+    [323.3153,  260.05283],
+    [336.7843,  260.45132],
+    [350.52014, 260.5951 ],
+    [364.50082, 260.87234],
+    [378.23056, 261.40582],
 ], dtype=np.float32)
 
 world_points_3d = np.array([
@@ -88,13 +63,16 @@ world_points_3d = np.array([
     [0.2515184408421431, -0.13816584516870278, 0.012483650489861761],
     [0.25077065872364485, -0.1162147352399853, 0.0121665226592364]
 ],dtype=np.float32)
-
+# her fjerner vi z fra arrayet Jeg kunne ikke få det til at virke med 3d punkter i må gerne lige undersøge om det har nogen effekt.
+# jeg ser umiddelbart ikke noge grund til at have z med da vi ikke kan bruge z til noget alligvel lige nu.
 world_points = world_points_3d[:, :2]
 
 # Compute homography
 H, _ = cv2.findHomography(image_points, world_points)
 
 # Now map a single pixel to world coordinates
+# her brugeer vi self homogeneous cordinater i en 3x3 matrix vi skal huske at hvis på et tidspunkt får depth til at virke
+# så skal vi bruge en 4x4 matrix så der der er z med i den.
 pixel = np.array([269.20438, 231.23853, 1], dtype=np.float32)  # homogeneous coords
 world = H.dot(pixel)
 world /= world[2]  # normalize
