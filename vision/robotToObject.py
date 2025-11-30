@@ -146,6 +146,7 @@ def find_red_center(frame_bgr):
 
 def main():
     # RTDE robot interfaces
+    # Tror godt vi kan fjerne RTDEControlInterface og RTDEReceiveInterface og bare skrive rtde(Robot_ip)
     rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP)
     rtde_r = rtde_receive.RTDEReceiveInterface(ROBOT_IP)
     print(f"Connected to UR3e at {ROBOT_IP}")
