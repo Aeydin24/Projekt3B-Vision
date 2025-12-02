@@ -1,12 +1,12 @@
 from StateMachine import StateMachine,State
 import cv2
-
-
+import vision as vi
 
 class idleState(State):
     
 
     def Run(self):
+        print()
         userIn = input("Enter a command (start/move/load/save/quit/velocity): ")
         if userIn == "start":
             self.stateMachine.changeState(analyzeState()) 
@@ -31,17 +31,10 @@ class moveState(State):
     def Enter(self):
         print("WE ARE NOW IN MOVESTATE ")
         self.Run()
-        pass
+        
            
     def Run(self):
-        userIn = input("Enter a command (start/move/load/save/quit/velocity): WE ARE NOW IN MOVESTATE ")
-        if userIn == "start":
-            self.stateMachine.changeState(analyzeState()) 
-        elif userIn == "move":
-            self.stateMachine.changeState(moveState())
-        else:
-            print("Invalid command")
-            self.stateMachine.changeState(idleState())
+
         pass
 
     def Exit(self):
@@ -53,7 +46,7 @@ class errorState(State):
         pass   
     
     def Run(self):
-
+        
         pass
 
     def Exit(self):
@@ -61,9 +54,24 @@ class errorState(State):
 
 class analyzeState(State):
 
+    def Enter(self):
+        self.result = []
+        print("enter state:", self.result)
+        self.Run() 
+
     def Run(self):
-    
-        pass
+        if  not self.result:
+            print("Running vision analysis...")
+            self.result = vi.main()
+            print("Result after tcp:", self.result)
+            if self.result:
+                print("Result already obtained:", self.result)
+                self.stateMachine.changeState(idleState())
+        else:
+            print("Could be old result", self.result)
+            self.stateMachine.changeState(idleState())
+        
+        
 
 
 def main():
