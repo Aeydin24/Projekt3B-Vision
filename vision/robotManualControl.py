@@ -7,8 +7,8 @@ import rtde_control
 import rtde_receive
 
 
-ROBOT_IP = "192.168.1.25"
-ROBOT_FREQUENCY = 125  # Hz
+ROBOT_IP = "192.168.0.2"
+ROBOT_FREQUENCY = 500  # Hz
 
 
 def main():
@@ -19,8 +19,8 @@ def main():
 	dt = 1.0 / ROBOT_FREQUENCY
 
 	# step sizes (meters for XYZ, radians for rotations)
-	step_xy = 0.02
-	step_z = 0.02
+	step_xy = 0.05
+	step_z = 0.05
 	step_rot = np.deg2rad(1.0)
 
 	print("Manual control:")

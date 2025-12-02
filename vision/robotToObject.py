@@ -105,7 +105,6 @@ H, _ = cv2.findHomography(image_points, world_points)
 # Fixed Z height in meters
 Z_FIXED = 0.05
 
-
 def pixel_to_world(u: float, v: float):
     p = np.array([u, v, 1.0], dtype=np.float32)
     world = H @ p

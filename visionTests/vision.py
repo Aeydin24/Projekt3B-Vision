@@ -4,7 +4,6 @@ import time
 import cv2
 import depthai as dai
 import numpy as np
-import rtde_control
 import rtde_receive
 
 ROBOT_IP = "192.168.0.2"
@@ -144,7 +143,6 @@ def find_red_center(frame_bgr):
 
 
 def main():
-	rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP, ROBOT_FREQUENCY)
 	rtde_r = rtde_receive.RTDEReceiveInterface(ROBOT_IP, ROBOT_FREQUENCY)
 	print(f"Connected to UR3e at {ROBOT_IP}")
 

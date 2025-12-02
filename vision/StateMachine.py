@@ -1,3 +1,4 @@
+
 class State:
     pass
 
@@ -6,8 +7,10 @@ class StateMachine:
     def __init__(self, state:State):
         self.state = state
         self.state.stateMachine = self
+        self.previousState = None
 
     def changeState(self, newstate:State):
+        self.previousState = self.__class__.__name__
         self.state = self.state.Exit()
         self.state = newstate
 
@@ -50,7 +53,7 @@ class visionSystem(StateMachine.Machine):
     def __init__(self, state:StateMachine.State):
 
         super().__init__("visionSystem", state)
-
+        
         self.targetPos = []        # target position
         self.currentPos = []       # current position
         self.objectsDetected = []  # Liste med fundne objekter
