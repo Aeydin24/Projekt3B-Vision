@@ -134,13 +134,30 @@ class moveState(State):
         robot_ip = "192.168.0.2"
         conn = mf.getControlConnection(robot_ip)
         rec_conn = mf.getRecieveConnection(robot_ip)
-
-        currentPose = mf.getCurrentPose(rec_conn)
+        targetPose = sm.targetPose
         mf.moveRobot(conn, sm.targetPose)
 
-        while currentPose != sm.targetPose:
-            print("Moving to target pose...")
+        # tolerance in meters
+        pos_tol = 0.005  # 5 mm
+
+        while True:
+            currentPose = mf.getCurrentPose(rec_conn)
+
+            # only compare XYZ
+            pos_current = np.array(currentPose[:3])
+            pos_target = np.array(targetPose[:3])
+
+            # Euclidean distance
+            pos_dist = np.linalg.norm(pos_current - pos_target)
+
+            if pos_dist < pos_tol:
+                print("Target position reached within tolerance.")
+                break
+
+            print("Moving to target position...")
+            print("Current:", pos_current, "Distance:", pos_dist)
             time.sleep(1)
+
 
         # Grib om emne her
         # mf.useGripper(robot_ip, 30, 40)
