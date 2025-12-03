@@ -38,3 +38,9 @@ class StateMachine:
         while self.running:
             self.state = self.state.Run()
 
+class Objects:
+    def __init__(self, color:str, shape, px:int, py:int):
+        self.color = color
+        self.shape = shape
+        self.px = px
+        self.py = py

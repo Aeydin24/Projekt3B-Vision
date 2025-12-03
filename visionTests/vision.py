@@ -8,10 +8,6 @@ import numpy as np
 import rtde_control
 import rtde_receive
 
-class objects:
-    
-
-
 ROBOT_IP = "192.168.0.2"
 
 image_points = np.array([

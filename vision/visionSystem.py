@@ -73,6 +73,7 @@ square = detect_squares(grayVideo)
     
     
 #---------- COLOR DETECTION ----------
+
 def detectColors(self, frame_bgr,  x, y, r):
     x1, y1 = max(0, x - r), max(0, y - r)
     x2, y2 = min(x + r, frame_bgr.shape[1]), min(y + r, frame_bgr.shape[0])
@@ -101,11 +102,7 @@ def detectColors(self, frame_bgr,  x, y, r):
     "green": cv2.countNonZero(mask_green),
     "yellow": cv2.countNonZero(mask_yellow),
     } 
-    return max(counts, key=counts.get)  
-
-
-
-
+    return max(counts, key=counts.get)
 
 if square:
     for sq in square:
