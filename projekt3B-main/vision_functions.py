@@ -3,8 +3,6 @@ import numpy as np
 import depthai as dai
 import time
 
-
-
 def pixel_to_world(u: float, v: float, H):
     p = np.array([u, v, 1.0], dtype=np.float32)
     world = H @ p
@@ -65,4 +63,5 @@ def create_bgr_pipeline():
         while pipeline.isRunning():
             videoIn = videoQueue.get()
             frame = videoIn.getCvFrame()
+            break
         return frame

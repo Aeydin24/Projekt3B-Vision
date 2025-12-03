@@ -1,11 +1,12 @@
 import time
 
+import rtde_receive
 import vision_functions as vf
 import move_functions as mf
 from StateMachine import StateMachine, State
 import cv2
 import numpy as np
-import rtde_receive
+
 
 
 
@@ -27,6 +28,7 @@ class analyzeState(State):
     def Run(self):
         # Init af robotÍP, pixelværdier og deres korresponderende punkter i 3D space.
         robot_ip = "192.168.0.2"
+        rec_conn = mf.getRecieveConnection(robot_ip)
         image_points = np.array([
             [269.20438, 231.23853],
 
@@ -117,17 +119,13 @@ class analyzeState(State):
         # Udregning af homografi for billede planet og 3D planet
         H, _ = cv2.findHomography(image_points, world_points)
         # Fast Z punkt i 3D space
-        z_fixed = 0.05
+        z_fixed = 0.2
         # Init af bgr videofeed
         frame = vf.create_bgr_pipeline()
-        time.sleep(5)
+        time.sleep(2)
         center_point = vf.find_red_center(frame)
-        targetPose = vf.print_target_pose(center_point ,robot_ip, z_fixed, H)
+        targetPose = vf.print_target_pose(center_point , z_fixed, H, rec_conn)
         sm.targetPose = targetPose
-        self.Exit()
-
-    def Exit(self):
-        print("Exiting analyseState...")
         sm.changeState(moveState())
 
 class moveState(State):
@@ -145,14 +143,14 @@ class moveState(State):
             time.sleep(1)
 
         # Grib om emne her
-        mf.useGripper(robot_ip, 30, 40)
+        # mf.useGripper(robot_ip, 30, 40)
         # Skift targetPose til ny pose
-        sm.targetPose = []
+        # sm.targetPose = []
         # Kør mod sorteringsplads
-        mf.moveRobot(conn, sm.targetPose)
+        # mf.moveRobot(conn, sm.targetPose)
         # Slip emne
-        mf.useGripper(robot_ip, 0, 0)
-        sm.changeState(idleState())
+        # mf.useGripper(robot_ip, 0, 0)
+        # sm.changeState(idleState())
 
     def Exit(self):
         pass
