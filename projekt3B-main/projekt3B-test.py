@@ -7,8 +7,9 @@ from StateMachine import StateMachine, State
 import cv2
 import numpy as np
 
-
-
+robot_ip = "192.168.0.2"
+conn = mf.getControlConnection(robot_ip)
+rec_conn = mf.getRecieveConnection(robot_ip)
 
 # noinspection PyUnresolvedReferences
 class idleState(State):
@@ -27,8 +28,6 @@ class analyzeState(State):
 
     def Run(self):
         # Init af robotÍP, pixelværdier og deres korresponderende punkter i 3D space.
-        robot_ip = "192.168.0.2"
-        rec_conn = mf.getRecieveConnection(robot_ip)
         image_points = np.array([
             [269.20438, 231.23853],
 
@@ -131,11 +130,9 @@ class analyzeState(State):
 class moveState(State):
 
     def Run(self):
-        robot_ip = "192.168.0.2"
-        conn = mf.getControlConnection(robot_ip)
-        rec_conn = mf.getRecieveConnection(robot_ip)
+
         targetPose = sm.targetPose
-        mf.moveRobot(conn, sm.targetPose)
+        mf.moveRobot(conn, targetPose)
 
         # tolerance in meters
         pos_tol = 0.005  # 5 mm
@@ -157,7 +154,8 @@ class moveState(State):
             print("Moving to target position...")
             print("Current:", pos_current, "Distance:", pos_dist)
             time.sleep(1)
-
+        mf.useGripper(conn, 30.0, 40)
+        sm.changeState(idleState())
 
         # Grib om emne her
         # mf.useGripper(robot_ip, 30, 40)

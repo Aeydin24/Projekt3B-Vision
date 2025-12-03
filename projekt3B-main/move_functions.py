@@ -4,7 +4,7 @@ import time
 import cv2
 import numpy as np
 import depthai as dai
-import onRobot.gripper as gripper
+
 
 def getControlConnection(robot_ip):
     conn = rtde_control.RTDEControlInterface(robot_ip)
@@ -25,8 +25,8 @@ def getCurrentPose(rec_conn):
     currentPose = rec_conn.getActualTCPPose()
     return currentPose
 
-def useGripper(robot_ip,  width, force):
-    rgg = gripper.RG2(robot_ip)
-    rgg.rg_grip(width, force)
+def useGripper(conn, width:float, force):
+    conn.sendCustomScript("rg2_init()")
+    conn.sendCustomScript(f"rg_grip({width},{force})")
 
 
