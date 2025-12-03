@@ -17,7 +17,6 @@ def main():
     rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP)
     print(f"Connected to UR3e at {ROBOT_IP}")
 
-
     # Vi bruger det samme som fra depthai github eksempler så vi undgår xout osv.
     # igen vi må lige snakke sammen om det her senere jeg syntes vi skal holde det som det er her helt simplet.
     # kunne være fedt hvis der var en der undersøgte om vi kunne sætte fokus på kamera via pipeline.

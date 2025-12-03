@@ -3,16 +3,16 @@ class State:
 
     def Enter(self):
         self.stateMess = "Entering"
-        print(f"Entering state: {self.__class__.__name__}")
+        print(f"Entering {self.__class__.__name__}")
         self.Run()
 
     def Run(self):
         self.stateMess = "Running"
-        print(f"Running state: {self.__class__.__name__}")
+        print(f"Running {self.__class__.__name__}")
 
     def Exit(self):
         self.stateMess = "Exiting"
-        print(f"Exiting state: {self.__class__.__name__}")
+        print(f"Exiting {self.__class__.__name__}")
 
     def getState(self):
         return self.stateMess
@@ -21,6 +21,7 @@ class State:
 class StateMachine:
 
     def __init__(self, state: State):
+        self.targetPose = None
         self.state = state
         self.state.stateMachine = self
         self.previousState = None

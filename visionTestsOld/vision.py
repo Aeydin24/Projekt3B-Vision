@@ -157,12 +157,7 @@ def main():
     with dai.Pipeline() as pipeline:
         cam = pipeline.create(dai.node.Camera).build()
         videoQueue = cam.requestOutput((640, 480)).createOutputQueue()
-
         pipeline.start()
-        #print("Camera started. Press 'g' to move to red object, 'q' to quit.")
-
-        red_center = None
-
         while pipeline.isRunning():
             videoIn = videoQueue.get()
             frame = videoIn.getCvFrame()
@@ -180,15 +175,6 @@ def main():
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.8,
                     (35, 0, 70),
-                    2,
-                )
-                cv2.putText(
-                    frame,
-                    "Press 'g' to move here",
-                    (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,
-                    (0, 0, 255),
                     2,
                 )
             else:
@@ -209,24 +195,12 @@ def main():
 
             if red_center is not None:
                 cx, cy = red_center
-                #print(f"Using detected object center pixel: ({cx},{cy})")
                 world = pixel_to_world(cx, cy)
                 if world is None:
-                    #print("Homography mapping failed.")
                     continue
-
                 x_w, y_w = world
                 z_w = Z_FIXED
-                #print("Mapped world coordinates (x,y,z):", x_w, y_w, z_w)
-
-                # Get current TCP pose and build target pose
                 tcp_pose = rtde_r.getActualTCPPose()
-                #print("Current TCP pose:", tcp_pose)
-
-                #her har vi den her liste gruden til at fordi ligenu får vi ikke vores rotations matrix. så der får tager vi
-                # vores current tcp position fra robten så bagefter ændre vi bare de 3 første værdier i arrayet så vores nu værneede
-                # rotation på tcp ikke ændre sig vi kan altid bare tilføje vores egen rotation hvis vi vil men eller altid bare 
-                # sætte den så den altid peget nedad det må vi lige finde ud af.
                 target_pose = list(tcp_pose)
                 target_pose[0] = x_w
                 target_pose[1] = y_w
@@ -243,8 +217,3 @@ def main():
         print("Done.")
             
     return target_pose
-
-
-
-if __name__ == "__main__":
-    main()
