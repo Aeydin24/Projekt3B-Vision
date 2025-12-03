@@ -6,9 +6,13 @@ import numpy as np
 import depthai as dai
 import onRobot.gripper as gripper
 
-def getConnection(robot_ip):
+def getControlConnection(robot_ip):
     conn = rtde_control.RTDEControlInterface(robot_ip)
     return conn
+
+def getRecieveConnection(robot_ip):
+    rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
+    return rec_conn
 
 def moveRobot(conn, targetPose):
     print("Target TCP pose:", targetPose)

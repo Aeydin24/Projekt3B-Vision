@@ -2,12 +2,11 @@ import time
 
 import vision_functions as vf
 import move_functions as mf
-from StateMachine import StateMachine, State, Objects
+from StateMachine import StateMachine, State
 import cv2
 import numpy as np
-import rtde_control
 import rtde_receive
-import onRobot.gripper as gripper
+
 
 
 # noinspection PyUnresolvedReferences
@@ -135,8 +134,10 @@ class moveState(State):
 
     def Run(self):
         robot_ip = "192.168.0.2"
-        conn = mf.getConnection(robot_ip)
-        currentPose = mf.getCurrentPose(rtde_receive)
+        conn = mf.getControlConnection(robot_ip)
+        rec_conn = mf.getRecieveConnection(robot_ip)
+
+        currentPose = mf.getCurrentPose(rec_conn)
         mf.moveRobot(conn, sm.targetPose)
 
         while currentPose != sm.targetPose:

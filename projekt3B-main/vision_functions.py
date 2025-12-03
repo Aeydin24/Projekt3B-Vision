@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import depthai as dai
 import time
-import rtde_receive
+
 
 
 def pixel_to_world(u: float, v: float, H):
@@ -41,15 +41,13 @@ def find_red_center(frame_bgr):
     cy = int(M["m01"] / M["m00"])
     return cx, cy
 
-def print_target_pose(center_points, robot_ip, z_fixed, homografi):
-    rtde_r = rtde_receive.RTDEReceiveInterface(robot_ip)
-
+def print_target_pose(center_points, z_fixed, homografi, rec_conn):
     if center_points is not None:
         cx, cy = center_points
         world = pixel_to_world(cx, cy, homografi)
         x_w, y_w = world
         z_w = z_fixed
-        tcp_pose = rtde_r.getActualTCPPose()
+        tcp_pose = rec_conn.getActualTCPPose()
         target_pose = list(tcp_pose)
         target_pose[0] = x_w
         target_pose[1] = y_w
