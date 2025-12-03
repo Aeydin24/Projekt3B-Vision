@@ -1,18 +1,19 @@
 import time
 
 import rtde_receive
+import rtde_control
 import vision_functions as vf
 import move_functions as mf
 from StateMachine import StateMachine, State
 import cv2
 import numpy as np
 
-try:
-    robot_ip = "192.168.0.2"
-    conn = mf.getControlConnection(robot_ip)
-    rec_conn = mf.getRecieveConnection(robot_ip)
-except RuntimeError:
-    print("Something went wrong with the connection to the robot. Check that it is in remote control mode, or check your connection to the controller.")
+
+robot_ip = "192.168.0.2"
+conn = rtde_control.RTDEControlInterface(robot_ip)
+rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
+
+
 # noinspection PyUnresolvedReferences
 class idleState(State):
 
@@ -135,29 +136,23 @@ class moveState(State):
 
         targetPose = sm.targetPose
         mf.moveRobot(conn, targetPose)
+        mf.toleranceCheck(rec_conn,targetPose)
 
-        # tolerance in meters
-        pos_tol = 0.005  # 5 mm
 
-        while True:
-            currentPose = mf.getCurrentPose(rec_conn)
+        time.sleep(1)
 
-            # only compare XYZ
-            pos_current = np.array(currentPose[:3])
-            pos_target = np.array(targetPose[:3])
+        targetPose = sm.home
+        mf.moveRobot(conn, targetPose)
+        mf.toleranceCheck(rec_conn, targetPose)
 
-            # Euclidean distance
-            pos_dist = np.linalg.norm(pos_current - pos_target)
+        print("Successfully reached home")
+        time.sleep(1)
 
-            if pos_dist < pos_tol:
-                print("Target position reached within tolerance.")
-                break
 
-            print("Moving to target position...")
-            print("Current:", pos_current, "Distance:", pos_dist)
-            time.sleep(1)
-        mf.useGripper(conn, 30.0, 40)
-        sm.changeState(idleState())
+        targetPose = sm.redDepot
+        mf.moveRobot(conn, targetPose)
+        mf.toleranceCheck(rec_conn, targetPose)
+        mf.useGripper(conn, 80, 40)
 
         # Grib om emne her
         # mf.useGripper(robot_ip, 30, 40)

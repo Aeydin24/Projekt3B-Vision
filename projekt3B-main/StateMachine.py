@@ -22,6 +22,10 @@ class StateMachine:
 
     def __init__(self, state: State):
         self.targetPose = None
+        self.redDepot = [-0.26125, -0.20881, 0.2, 0.0, 0.0, 0.0]
+        self.yellowDepot = [-0.398768, -0.8242, 0.2, 0.0, 0.0, 0.0]
+        self.greenDepot = [-0.37500, -0.34612, 0.2, 0.0, 0.0, 0.0]
+        self.home = [-0.009, -0.30698, 0.2, 0.0, 0.0, 0.0]
         self.state = state
         self.state.stateMachine = self
         self.previousState = None
