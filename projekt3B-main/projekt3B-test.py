@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import rtde_control
 import rtde_receive
+import onRobot.gripper as gripper
 
 
 # noinspection PyUnresolvedReferences
@@ -122,7 +123,7 @@ class analyzeState(State):
         frame = vf.create_bgr_pipeline()
         time.sleep(5)
         center_point = vf.find_red_center(frame)
-        targetPose = vf.print_target_pose(center_point ,robot_ip, z_fixed)
+        targetPose = vf.print_target_pose(center_point ,robot_ip, z_fixed, H)
         sm.targetPose = targetPose
         self.Exit()
 
@@ -142,7 +143,15 @@ class moveState(State):
             print("Moving to target pose...")
             time.sleep(1)
 
-
+        # Grib om emne her
+        mf.useGripper(robot_ip, 30, 40)
+        # Skift targetPose til ny pose
+        sm.targetPose = []
+        # Kør mod sorteringsplads
+        mf.moveRobot(conn, sm.targetPose)
+        # Slip emne
+        mf.useGripper(robot_ip, 0, 0)
+        sm.changeState(idleState())
 
     def Exit(self):
         pass
