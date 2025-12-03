@@ -7,10 +7,12 @@ from StateMachine import StateMachine, State
 import cv2
 import numpy as np
 
-robot_ip = "192.168.0.2"
-conn = mf.getControlConnection(robot_ip)
-rec_conn = mf.getRecieveConnection(robot_ip)
-
+try:
+    robot_ip = "192.168.0.2"
+    conn = mf.getControlConnection(robot_ip)
+    rec_conn = mf.getRecieveConnection(robot_ip)
+except RuntimeError:
+    print("Something went wrong with the connection to the robot. Check that it is in remote control mode, or check your connection to the controller.")
 # noinspection PyUnresolvedReferences
 class idleState(State):
 
