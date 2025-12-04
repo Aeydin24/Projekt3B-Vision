@@ -1,6 +1,7 @@
 import time
 import rtde_receive
 import rtde_control
+import rtde_io
 import vision_functions as vf
 import move_functions as mf
 from StateMachine import StateMachine, State
@@ -9,9 +10,9 @@ import numpy as np
 # Init af forbindelser til robot RTDE control & recieve interfaces
 robot_ip = "192.168.0.2"
 conn = rtde_control.RTDEControlInterface(robot_ip)
+connIO = rtde_io.RTDEIOInterface(robot_ip)
 rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
 frame = vf.create_bgr_pipeline()
-
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
 # OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
@@ -64,7 +65,7 @@ class moveState(State):
                      targetPose)
         mf.toleranceCheck(rec_conn,
                           targetPose)
-        mf.useGripper(conn,
+        mf.useGripper(connIO,
                       80,
                       40)
         # Grib om emne her

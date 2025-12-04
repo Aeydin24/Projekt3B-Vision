@@ -1,5 +1,4 @@
-import rtde_receive
-import rtde_control
+
 import time
 import numpy as np
 
@@ -14,9 +13,11 @@ def getCurrentPose(rec_conn):
     currentPose = rec_conn.getActualTCPPose()
     return currentPose
 
-def useGripper(conn, width:float, force):
-    conn.sendCustomScript("rg2_init()")
-    conn.sendCustomScript(f"rg_grip({width},{force})")
+def closeGripper(connIO):
+    connIO.setToolDigitalOut(0, False)
+
+def openGripper(connIO):
+    connIO.setToolDigitalOut(0, True)
 
 def toleranceCheck(rec_conn, targetPose):
     # tolerance in meters
