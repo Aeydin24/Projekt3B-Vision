@@ -10,6 +10,7 @@ import numpy as np
 robot_ip = "192.168.0.2"
 conn = rtde_control.RTDEControlInterface(robot_ip)
 rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
+frame = vf.create_bgr_pipeline()
 
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
@@ -26,13 +27,16 @@ class idleState(State):
             print("Invalid command")
             sm.changeState(idleState())
 
-# analyseState er hvor behandling af koordinatsystemer, kamerafeed, og billedebehandling foregår.
+# analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
 class analyzeState(State):
     def Run(self):
-        data = np.load("homography.npz")
-        H = data["H"]
+        try:
+            data = np.load("homography.npz")
+            H = data["H"]
+        except FileNotFoundError:
+            print("File has not been found. Make sure you have a file in the same directory called 'homography.npz'")
+            sm.changeState(errorState())
         z_fixed = 0.2
-        frame = vf.create_bgr_pipeline()
         time.sleep(2)
         center_point = vf.find_red_center(frame)
         sm.targetPose = vf.print_target_pose(center_point,
@@ -78,15 +82,16 @@ class moveState(State):
 
 
 class errorState(State):
-    def Enter(self):
-        pass
 
     def Run(self):
-        pass
-
-    def Exit(self):
-        pass
-
+        userIn = input("An error has occurred. Type 'quit' to terminate the program or type 'acknowledge' to acknowledge the error and return to idleState.")
+        if userIn == "quit":
+            exit(0)
+        elif userIn == "acknowledge":
+            sm.changeState(idleState())
+        else:
+            print("Invalid command")
+            sm.changeState(idleState())
 
 if __name__ == "__main__":
     sm = StateMachine(idleState())
