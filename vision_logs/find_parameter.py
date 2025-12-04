@@ -7,11 +7,7 @@ import cv2
 import numpy as np
 
 # ---------- Konfiguration ----------
-LOG_DIR = "vision_logs"
-LOG_FILE = os.path.join(LOG_DIR, "vision_log.csv")
 
-VIEW_WIN = "OAK-D PoE - RGB / Color / Mask / Edges"
-CTRL_WIN = "Controls"
 
 last_frame = None
 last_combined = None
