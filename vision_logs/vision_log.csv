@@ -1,0 +1,4 @@
+ID;Timestamp;H_min;H_max;S_min;S_max;V_min;V_max;Canny_min;Canny_max;MinR;MaxR;ImagePath;Comment
+VISION_001;2025-12-04 13:16:48;0;179;0;255;0;255;50;150;10;100;VISION_001.png;alt for sensitiv, fanger alt
+VISION_002;2025-12-04 13:18:23;0;179;0;255;0;255;50;150;10;100;VISION_002.png;
+VISION_003;2025-12-04 13:18:38;0;179;0;255;0;255;50;150;10;100;VISION_003.png;test
