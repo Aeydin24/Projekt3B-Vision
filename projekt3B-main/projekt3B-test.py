@@ -31,14 +31,10 @@ class idleState(State):
 # analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
 class analyzeState(State):
     def Run(self):
-        try:
-            data = np.load("homography.npz")
-            H = data["H"]
-        except FileNotFoundError:
-            print("File has not been found. Make sure you have a file in the same directory called 'homography.npz'")
-            sm.changeState(errorState())
-        z_fixed = 0.2
-        time.sleep(2)
+        data = np.load("homography.npz")
+        H = data["H"]
+        z_fixed = 0.05
+        time.sleep(5)
         center_point = vf.find_red_center(frame)
         sm.targetPose = vf.print_target_pose(center_point,
                                              z_fixed,
@@ -48,39 +44,28 @@ class analyzeState(State):
 
 class moveState(State):
     def Run(self):
+        mf.openGripper(connIO, rec_conn)
         mf.moveRobot(conn,
                      sm.targetPose)
         mf.toleranceCheck(rec_conn,
                           sm.targetPose)
-        time.sleep(1)
-        targetPose = sm.home
-        mf.moveRobot(conn,
-                     targetPose)
+        mf.closeGripper(connIO, rec_conn)
+        time.sleep(2)
+        sm.targetPose = mf.hard_coded_poses(rec_conn,
+                                            sm.home)
+        mf.moveRobot(conn, sm.targetPose)
         mf.toleranceCheck(rec_conn,
-                          targetPose)
-        print("Successfully reached home")
-        time.sleep(1)
-        targetPose = sm.redDepot
-        mf.moveRobot(conn,
-                     targetPose)
+                          sm.targetPose)
+
+        time.sleep(5)
+
+        sm.targetPose = mf.hard_coded_poses(rec_conn,
+                                            sm.redDepot)
+        mf.moveRobot(conn, sm.targetPose)
         mf.toleranceCheck(rec_conn,
-                          targetPose)
-        mf.useGripper(connIO,
-                      80,
-                      40)
-        # Grib om emne her
-        # mf.useGripper(robot_ip, 30, 40)
-        # Skift targetPose til ny pose
-        # sm.targetPose = []
-        # Kør mod sorteringsplads
-        # mf.moveRobot(conn, sm.targetPose)
-        # Slip emne
-        # mf.useGripper(robot_ip, 0, 0)
-        # sm.changeState(idleState())
-
-    def Exit(self):
-        pass
-
+                          sm.targetPose)
+        mf.openGripper(connIO, rec_conn)
+        sm.changeState(idleState())
 
 class errorState(State):
 

@@ -40,7 +40,7 @@ def find_red_center(frame_bgr):
     return cx, cy
 
 def print_target_pose(center_points, z_fixed, homografi, rec_conn):
-    if center_points is not None:
+    try:
         cx, cy = center_points
         world = pixel_to_world(cx, cy, homografi)
         x_w, y_w = world
@@ -52,8 +52,10 @@ def print_target_pose(center_points, z_fixed, homografi, rec_conn):
         target_pose[2] = z_w
         time.sleep(0.5)
         print("Target TCP pose:", target_pose)
+        return target_pose
+    except TypeError:
+        print("Error in print_target_pose function. center_points might be NoneType. ")
 
-    return target_pose
 
 def create_bgr_pipeline():
     with dai.Pipeline() as pipeline:
@@ -63,5 +65,4 @@ def create_bgr_pipeline():
         while pipeline.isRunning():
             videoIn = videoQueue.get()
             frame = videoIn.getCvFrame()
-            break
-        return frame
+            return frame
