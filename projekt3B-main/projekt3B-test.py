@@ -12,7 +12,6 @@ robot_ip = "192.168.0.2"
 conn = rtde_control.RTDEControlInterface(robot_ip)
 connIO = rtde_io.RTDEIOInterface(robot_ip)
 rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
-frame = vf.create_bgr_pipeline()
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
 # OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
@@ -31,15 +30,13 @@ class idleState(State):
 # analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
 class analyzeState(State):
     def Run(self):
+        frame = vf.create_bgr_pipeline()
         data = np.load("homography.npz")
         H = data["H"]
-        z_fixed = 0.05
+        z_fixed = 0.02
         time.sleep(5)
         center_point = vf.find_red_center(frame)
-        sm.targetPose = vf.print_target_pose(center_point,
-                                             z_fixed,
-                                             H,
-                                             rec_conn)
+        sm.targetPose = vf.print_target_pose(center_point, z_fixed, H, rec_conn)
         sm.changeState(moveState())
 
 class moveState(State):

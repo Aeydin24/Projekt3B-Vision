@@ -62,7 +62,10 @@ def create_bgr_pipeline():
         cam = pipeline.create(dai.node.Camera).build()
         videoQueue = cam.requestOutput((640, 480)).createOutputQueue()
         pipeline.start()
+        time.sleep(5)
         while pipeline.isRunning():
             videoIn = videoQueue.get()
             frame = videoIn.getCvFrame()
-            return frame
+            if frame is not None:
+                break
+        return frame
