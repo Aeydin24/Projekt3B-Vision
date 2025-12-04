@@ -18,7 +18,6 @@ def useGripper(conn, width:float, force):
     conn.sendCustomScript("rg2_init()")
     conn.sendCustomScript(f"rg_grip({width},{force})")
 
-
 def toleranceCheck(rec_conn, targetPose):
     # tolerance in meters
     pos_tol = 0.005  # 5 mm
