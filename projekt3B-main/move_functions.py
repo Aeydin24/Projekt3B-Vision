@@ -17,30 +17,27 @@ def getCurrentPose(rec_conn):
 def closeGripper(connIO, rec_conn):
     if not rec_conn.getDigitalOutState(16):
         connIO.setToolDigitalOut(0, True)
-
+    else:
+        print("Gripper is already closed!")
 def openGripper(connIO, rec_conn):
     if rec_conn.getDigitalOutState(16):
         connIO.setToolDigitalOut(0, False)
-
+    else:
+        print("Gripper is already open!")
 def toleranceCheck(rec_conn, targetPose):
     try:
         # tolerance in meters
         pos_tol = 0.005  # 5 mm
-
         while True:
             currentPose = getCurrentPose(rec_conn)
-
             # only compare XYZ
             pos_current = np.array(currentPose[:3])
             pos_target = np.array(targetPose[:3])
-
             # Euclidean distance
             pos_dist = np.linalg.norm(pos_current - pos_target)
-
             if pos_dist < pos_tol:
                 print("Target position reached within tolerance.")
                 break
-
             print("Moving to target position...")
             print("Current:", pos_current, "Distance:", pos_dist)
             time.sleep(1)

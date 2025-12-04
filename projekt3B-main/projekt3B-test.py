@@ -45,25 +45,17 @@ class analyzeState(State):
 class moveState(State):
     def Run(self):
         mf.openGripper(connIO, rec_conn)
-        mf.moveRobot(conn,
-                     sm.targetPose)
-        mf.toleranceCheck(rec_conn,
-                          sm.targetPose)
+        mf.moveRobot(conn, sm.targetPose)
+        mf.toleranceCheck(rec_conn, sm.targetPose)
         mf.closeGripper(connIO, rec_conn)
         time.sleep(2)
-        sm.targetPose = mf.hard_coded_poses(rec_conn,
-                                            sm.home)
+        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.home)
         mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn,
-                          sm.targetPose)
-
+        mf.toleranceCheck(rec_conn, sm.targetPose)
         time.sleep(5)
-
-        sm.targetPose = mf.hard_coded_poses(rec_conn,
-                                            sm.redDepot)
+        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.redDepot)
         mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn,
-                          sm.targetPose)
+        mf.toleranceCheck(rec_conn, sm.targetPose)
         mf.openGripper(connIO, rec_conn)
         sm.changeState(idleState())
 
