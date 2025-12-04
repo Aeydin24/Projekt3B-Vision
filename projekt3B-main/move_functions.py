@@ -17,11 +17,14 @@ def getCurrentPose(rec_conn):
 def closeGripper(connIO, rec_conn):
     if not rec_conn.getDigitalOutState(16):
         connIO.setToolDigitalOut(0, True)
+        time.sleep(1)
     else:
         print("Gripper is already closed!")
+
 def openGripper(connIO, rec_conn):
     if rec_conn.getDigitalOutState(16):
         connIO.setToolDigitalOut(0, False)
+        time.sleep(1)
     else:
         print("Gripper is already open!")
 def toleranceCheck(rec_conn, targetPose):

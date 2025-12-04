@@ -31,29 +31,36 @@ class idleState(State):
 class analyzeState(State):
     def Run(self):
         frame = vf.create_bgr_pipeline()
-        data = np.load("homography.npz")
-        H = data["H"]
-        z_fixed = 0.02
-        time.sleep(5)
+        try:
+            data = np.load("homography.npz")
+            H = data["H"]
+        except FileNotFoundError:
+            print("Theres no file called homography.npz")
+        z_fixed = 0.012
         center_point = vf.find_red_center(frame)
         sm.targetPose = vf.print_target_pose(center_point, z_fixed, H, rec_conn)
         sm.changeState(moveState())
 
 class moveState(State):
     def Run(self):
+
         mf.openGripper(connIO, rec_conn)
         mf.moveRobot(conn, sm.targetPose)
         mf.toleranceCheck(rec_conn, sm.targetPose)
         mf.closeGripper(connIO, rec_conn)
-        time.sleep(2)
+
         sm.targetPose = mf.hard_coded_poses(rec_conn, sm.home)
         mf.moveRobot(conn, sm.targetPose)
         mf.toleranceCheck(rec_conn, sm.targetPose)
-        time.sleep(5)
+
         sm.targetPose = mf.hard_coded_poses(rec_conn, sm.redDepot)
         mf.moveRobot(conn, sm.targetPose)
         mf.toleranceCheck(rec_conn, sm.targetPose)
         mf.openGripper(connIO, rec_conn)
+
+        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.home)
+        mf.moveRobot(conn, sm.targetPose)
+        mf.toleranceCheck(rec_conn, sm.targetPose)
         sm.changeState(idleState())
 
 class errorState(State):
