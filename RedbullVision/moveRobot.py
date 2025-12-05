@@ -2,7 +2,7 @@ import rtde_control
 import rtde_receive
 import rtde_io
 import time
-homePos= [-0.009, -0.30698, 0.2]
+#homePos= [-0.009, -0.30698, 0.2]
 
 ROBOT_IP = "192.168.0.2"
 rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP)
@@ -27,11 +27,11 @@ def move_to_target(target_pose):
     except Exception as e:
         print(f"moveRobot: Error during movement: {e}")
 
-
-def stop_movement():
+#vi kan selv styre vores stop forxemple hvis vi bruger yolo til hånd så skal den stoppe hårdt, hvis det bare er normal stop så kan det være blødt
+def stop_movement(stopSpeed):
     try:
         rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP)
-        rtde_c.stopL()
+        rtde_c.stopL(stopSpeed)
         print("moveRobot: Movement stopped.")
     except Exception as e:
         print(f"moveRobot: Error stopping movement: {e}")

@@ -2,9 +2,8 @@ import numpy as np
 redDepot = [-0.26125, -0.20881, 0.2]  
 greenDepot = [-0.37500, -0.34612, 0.2]  
 yellowDepot = [-0.398768, -0.8242, 0.2]  
-restDepot = [0.8, -0.5, 0.1]  
+restDepot = [0.8, -0.5, 0.1] # depot for alt andet, Vi skal lige give den en position :)
 
-# note til mig selv husk a tilføj confidense 0-100%
 class productType:
     def __init__(self, name, shape, priority, lower_color, upper_color, min_area, max_area, z_pick, depot_location):
         self.name = name
@@ -90,5 +89,3 @@ yellow_pill_glass = productType(
 	z_pick=0.10,
     depot_location=yellowDepot
 )
-
-

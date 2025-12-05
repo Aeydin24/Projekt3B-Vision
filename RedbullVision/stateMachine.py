@@ -23,8 +23,7 @@ class stateMachine:
         self.target_pose = None
         self.state = state
         self.state.stateMachine = self
-        self.previousState = None
-
+        
     def changeState(self, newstate:state):
         self.previousState = self.__class__.__name__
         self.state = self.state.Exit()
