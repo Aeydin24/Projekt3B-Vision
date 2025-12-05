@@ -1,8 +1,12 @@
 import numpy as np
+redDepot = [-0.26125, -0.20881, 0.2]  
+greenDepot = [-0.37500, -0.34612, 0.2]  
+yellowDepot = [-0.398768, -0.8242, 0.2]  
+restDepot = [0.8, -0.5, 0.1]  
 
 # note til mig selv husk a tilføj confidense 0-100%
 class productType:
-    def __init__(self, name, shape, priority, lower_color, upper_color, min_area, max_area, z_pick):
+    def __init__(self, name, shape, priority, lower_color, upper_color, min_area, max_area, z_pick, depot_location):
         self.name = name
         self.shape = shape
         self.priority = priority # lavere nummer = højere prioritet
@@ -13,6 +17,7 @@ class productType:
         self.max_area = max_area
         # z-højde hvor vi vil samle objektet op (i meter)
         self.z_pick = z_pick
+        self.depot_location = depot_location  # (x, y, z) koordinater for depot
 
 blue_box = productType(
 	name="blue_box",
@@ -23,6 +28,7 @@ blue_box = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=restDepot
 )
 
 green_box = productType(
@@ -34,6 +40,7 @@ green_box = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=greenDepot
 )
 
 red_pill_glass = productType(
@@ -45,6 +52,7 @@ red_pill_glass = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=redDepot
 )
 
 green_pill_glass = productType(
@@ -56,6 +64,7 @@ green_pill_glass = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=greenDepot
 )
 
 black_pill_glass = productType(
@@ -67,6 +76,7 @@ black_pill_glass = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=restDepot
 )
 
 yellow_pill_glass = productType(
@@ -78,4 +88,7 @@ yellow_pill_glass = productType(
 	min_area=300,
 	max_area=50000,
 	z_pick=0.10,
+    depot_location=yellowDepot
 )
+
+

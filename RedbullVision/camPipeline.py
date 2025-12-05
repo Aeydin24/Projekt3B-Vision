@@ -38,8 +38,6 @@ def image_capture():
     pipeline.stop()
     cv2.destroyAllWindows()
 
-
-
 if __name__ == "__main__":
     # Start it asynchronously:
     image_capture()
