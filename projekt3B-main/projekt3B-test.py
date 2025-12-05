@@ -1,4 +1,6 @@
 import time
+
+import cv2
 import rtde_receive
 import rtde_control
 import rtde_io
@@ -6,6 +8,7 @@ import vision_functions as vf
 import move_functions as mf
 from StateMachine import StateMachine, State
 import numpy as np
+
 
 # Init af forbindelser til robot RTDE control & recieve interfaces
 robot_ip = "192.168.0.2"
@@ -36,6 +39,7 @@ class analyzeState(State):
             H = data["H"]
         except FileNotFoundError:
             print("Theres no file called homography.npz")
+            sm.changeState(errorState())
         z_fixed = 0.012
         center_point = vf.find_red_center(frame)
         sm.targetPose = vf.print_target_pose(center_point, z_fixed, H, rec_conn)
