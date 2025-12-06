@@ -161,6 +161,7 @@ def run_detection():
             cv2.putText(frame, f"{prod_name}", (cx + 10, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             cv2.putText(frame, f"({cx}, {cy})", (cx + 10, cy + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             lorteFisseCameaPipeline.vizFrame = frame
+            
             if target_pose and time.time() - start_time < sampleTime:
                 print(f"Target Pose found: {target_pose}")
                 best_target_pose = target_pose

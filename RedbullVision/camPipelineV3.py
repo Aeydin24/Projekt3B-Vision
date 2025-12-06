@@ -44,17 +44,19 @@ class lorteFisseCameaPipeline:
     def display_frame(self):
         self.init_camera()
         while self.initFlag and self.pipeline.isRunning():
+
             noramlFrame = self.get_frame()
             if noramlFrame is not None and not self.vizualize:
-                cv2.imshow("shitty fucking lorte motherfucker indavelde FEED!", noramlFrame)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord('q'):
-                    break
-            elif self.vizualize is not None:
-                cv2.imshow("shitty fucking lorte motherfucker indavelde FEED! nu med vizualize effekt", self.vizFrame)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord('q'):
-                    break
+                finalFrame = noramlFrame
+
+            elif self.vizFrame is not None and self.vizualize:
+                finalFrame = self.vizFrame
+            
+            #PLEASE FUCNING DISLAY en frame for mmig
+            cv2.imshow("shitty fucking lorte motherfucker indavelde FEED! viz or no viz bid i puden!", finalFrame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
         self.close_camera()
 
 if __name__ == "__main__":
