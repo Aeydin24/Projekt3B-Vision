@@ -2,9 +2,9 @@ import time
 import cv2
 import depthai as dai
 import numpy as np
-import rtde_receive
 import products
 from camPipelineV3 import lorteFisseCameaPipeline
+from moveRobot import getCurrentPose
 
 # load homography
 data = np.load("homography.npz")
@@ -131,9 +131,7 @@ def get_target_pose(best_candidate, current_tcp_pose):
 #note til mig selv over nej om rtde skal starte i en  funktion isteder for main
 #note til mig selv overvej om vi skal starte cam pipeline i en funktion is istedet for.
 def run_detection():
-    rtde_r = rtde_receive.RTDEReceiveInterface(ROBOT_IP)
-    print(f"Connected to robot at {ROBOT_IP}")
-    
+
     product_list = get_all_products()
     start_time = time.time()
     sampleTime = 5 
@@ -142,21 +140,14 @@ def run_detection():
     # Run detection for a limited time or until a good object is found
     while True:
 
-        if not lorteFisseCameaPipeline.pipeline.isRunning():
+        frame = lorteFisseCameaPipeline.get_frame()
+        
+        if frame is None:
             print("Camera not initialized properly.")
             break
 
-        if not pipeline.isRunning():
-            break
-            
-        videoIn = videoQueue.get()
-        frame = videoIn.getCvFrame()
-        if frame is None:
-            continue
-        
         # Get current TCP pose
-        tcp_pose = rtde_r.getActualTCPPose()
-        
+        tcp_pose = getCurrentPose
         candidates = detect_objects(frame, product_list)
         best_obj = select_best_object(candidates, tcp_pose)
         # Calculate target pose
@@ -169,7 +160,7 @@ def run_detection():
             cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
             cv2.putText(frame, f"{prod_name}", (cx + 10, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             cv2.putText(frame, f"({cx}, {cy})", (cx + 10, cy + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            
+            lorteFisseCameaPipeline.vizFrame = frame
             if target_pose and time.time() - start_time < sampleTime:
                 print(f"Target Pose found: {target_pose}")
                 best_target_pose = target_pose

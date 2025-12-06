@@ -12,7 +12,6 @@ class lorteFisseCameaPipeline:
         self.videoIn = videoIn
         self.vizualize = vizualize
 
-
     def init_camera(self):
         if not self.initFlag and not self.pipeline.isRunning():
             print("pipeline already running")
@@ -35,8 +34,8 @@ class lorteFisseCameaPipeline:
 
     def get_frame(self):
         if self.initFlag and self.pipeline.isRunning():
-            self.videoIn = self.videoQueue.get()
-            frame = self.videoIn.getCvFrame()
+            videoIn = self.videoQueue.get()
+            frame = videoIn.getCvFrame()
             return frame
         else:
             print("could not get frame")
