@@ -3,9 +3,8 @@ import cv2
 import depthai as dai
 import numpy as np
 import rtde_receive
-import camPipeline
 import products
-import camPipeline
+from camPipelineV3 import lorteFisseCameaPipeline
 
 # load homography
 data = np.load("homography.npz")
@@ -136,15 +135,17 @@ def run_detection():
     print(f"Connected to robot at {ROBOT_IP}")
     
     product_list = get_all_products()
-    print("this is berfore trying to get init_camera")
-    pipeline, videoQueue = camPipeline.init_camera(flag=True)
-    print(pipeline, videoQueue)
     start_time = time.time()
     sampleTime = 5 
     best_target_pose = None
     target_depot = None
     # Run detection for a limited time or until a good object is found
     while True:
+
+        if not lorteFisseCameaPipeline.pipeline.isRunning():
+            print("Camera not initialized properly.")
+            break
+
         if not pipeline.isRunning():
             break
             

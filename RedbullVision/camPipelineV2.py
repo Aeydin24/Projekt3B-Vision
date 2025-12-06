@@ -3,82 +3,70 @@ import cv2
 import time
 
 class CameraPipeline:
-    def __init__(self, pipeline, videoQueue, init_flag, frame, cam):
+    def __init__(self, pipeline, videoQueue, initFlag, vizFrame, cam, videoIn, vizualize):
         self.pipeline = pipeline
         self.videoQueue = videoQueue
-        self.init_flag = init_flag
-        self.frame = frame
+        self.initFlag = initFlag
+        self.vizFrame = vizFrame
         self.cam = cam
+        self.videoIn = videoIn
+        self.vizualize = vizualize
 
 shitCam = CameraPipeline(
     pipeline=None,
     videoQueue=None,
-    init_flag=False,
-    frame=None
-    cam=None
+    initFlag=False,
+    vizFrame=None,
+    cam=None,
+    videoIn=None,
+    vizualize=False,
 )
 
-
 def init_camera():
-    if not shitCam.init_flag:
+    if not shitCam.initFlag:
         print("pipeline already running")
         shitCam.pipeline = dai.Pipeline()
         shitCam.cam = shitCam.pipeline.create(dai.node.Camera).build()
         shitCam.videoQueue = shitCam.cam.requestOutput((640, 480)).createOutputQueue()
         shitCam.pipeline.start()
         time.sleep(2)
-        shitCam.init_flag = True
+        shitCam.initFlag = True
         print("pipeline started")
     else:
         print("pipeline already running")
-
-
 
 def close_camera():
     shitCam.pipeline.stop()
+    shitCam.initFlag = False
     time.sleep(1)
-    shitCam.init_flag = False
+    cv2.destroyAllWindows()
     print("pipeline stopped")
 
-
-def init_camera(flag):
-    print("before doing pipeline .dai")
-    if flag == False:
-        global pipeline
-        pipelineGet = dai.Pipeline()
-        pipeline = pipelineGet
-
-    if not pipeline.isRunning():
-        print("this is the start of the if statement")        
-        cam = pipeline.create(dai.node.Camera).build()
-        global videoQueue
-        videoQueueGet = cam.requestOutput((640, 480)).createOutputQueue()
-        videoQueue = videoQueueGet
-        pipeline.start()
-        time.sleep(2)
-        print("pipeline started")
+def get_frame():
+    if shitCam.initFlag and shitCam.pipeline.isRunning():
+        shitCam.videoIn = shitCam.videoQueue.get()
+        frame = shitCam.videoIn.getCvFrame()
+        return frame
     else:
-        print("this is before videoQueue in else")
-        videoQueue = videoQueue
-        print("pipeline already running")
-    return pipeline, videoQueue
-
-def image_capture():
-    pipeline, videoQueue = init_camera(flag=False)
-    while pipeline.isRunning():
-        videoIn = videoQueue.get()
-        frame = videoIn.getCvFrame()
-        if frame is not None:
-            cv2.imshow("Camera Frame", frame)
+        print("could not get frame")
+        return None
+    
+def display_frame():
+    while shitCam.initFlag and shitCam.pipeline.isRunning():
+        noramlFrame = get_frame()
+        if noramlFrame is not None and not shitCam.vizualize:
+            cv2.imshow("shitty fucking lorte motherfucker indavelde FEED!", noramlFrame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q'):
                 break
-    pipeline.stop()
-    cv2.destroyAllWindows()
-
+        elif shitCam.vizualize is not None:
+            cv2.imshow("shitty fucking lorte motherfucker indavelde FEED! nu med vizualize effekt", shitCam.vizFrame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
+                break
+    close_camera()
 
 if __name__ == "__main__":
-    # Start it asynchronously:
-    image_capture()
+    init_camera()
 
     
