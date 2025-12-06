@@ -2,8 +2,45 @@ import depthai as dai
 import cv2
 import time
 
-pipeline = None
-videoQueue = None
+class CameraPipeline:
+    def __init__(self, pipeline, videoQueue, init_flag, frame, cam):
+        self.pipeline = pipeline
+        self.videoQueue = videoQueue
+        self.init_flag = init_flag
+        self.frame = frame
+        self.cam = cam
+
+shitCam = CameraPipeline(
+    pipeline=None,
+    videoQueue=None,
+    init_flag=False,
+    frame=None
+    cam=None
+)
+
+
+def init_camera():
+    if not shitCam.init_flag:
+        print("pipeline already running")
+        shitCam.pipeline = dai.Pipeline()
+        shitCam.cam = shitCam.pipeline.create(dai.node.Camera).build()
+        shitCam.videoQueue = shitCam.cam.requestOutput((640, 480)).createOutputQueue()
+        shitCam.pipeline.start()
+        time.sleep(2)
+        shitCam.init_flag = True
+        print("pipeline started")
+    else:
+        print("pipeline already running")
+
+
+
+def close_camera():
+    shitCam.pipeline.stop()
+    time.sleep(1)
+    shitCam.init_flag = False
+    print("pipeline stopped")
+
+
 def init_camera(flag):
     print("before doing pipeline .dai")
     if flag == False:
