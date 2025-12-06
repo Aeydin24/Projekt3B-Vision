@@ -2,25 +2,28 @@ import asyncio
 from stateMachine import stateMachine,state
 import detectObject
 import moveRobot
-import camPipeline
+from camPipelineV3 import lorteFisseCameaPipeline
 import threading
-startStream = False
+
 class idleState(state):
     def Enter(self):
-        print("WE ARE NOW IN IDLESTATE ")
+        print("WE ARE NOW IN IDLESTATE")
         self.Run()
     def Run(self):
-        global startStream
-        if startStream == False:
-            asyncCam = threading.Thread(name='image_capture', target=camPipeline.image_capture)
+
+        if not lorteFisseCameaPipeline.initFlag:
+            print("Starting camera stream in idleState")
+            asyncCam = threading.Thread(name='display frame', target=lorteFisseCameaPipeline.display_frame)
             asyncCam.start()
             startStream = True        
-        userIn = input("Enter a command (start/move): ")
+        userIn = input("Enter a command (start/move/vizmode):")
         if userIn == "start":
             self.stateMachine.changeState(analyzeState()) 
         elif userIn == "move":
             self.stateMachine.changeState(moveState())
-            stateMachine(idleState())
+        elif userIn == "vizmode":
+            lorteFisseCameaPipeline.vizualize = not lorteFisseCameaPipeline.vizualize
+            print(f"Vizualize mode set to: {lorteFisseCameaPipeline.vizualize}")
         else:
             print("Invalid command")
             self.stateMachine.changeState(idleState())
@@ -30,7 +33,7 @@ class idleState(state):
 
 class moveState(state):
     def Enter(self):
-        print("WE ARE NOW IN MOVESTATE ")
+        print("WE ARE NOW IN MOVESTATE")
         self.Run()
 
     def Run(self):
@@ -54,7 +57,7 @@ class moveState(state):
         moveRobot.openGripper()
         print("moveState: bevæger mod home:", home_pose)
         moveRobot.move_to_target(home_pose)
-        # Når vi er færdige med at flytte, gå tilbage til idle
+
         self.stateMachine.changeState(analyzeState())
 
     def Exit(self):
@@ -76,7 +79,7 @@ class errorState(state):
 class analyzeState(state):
 
     def Enter(self):
-        print("enter analyzeState:")
+        print("WE ARE NOW IN ANALYZESTATE")
         self.Run() 
 
     def Run(self):
@@ -90,7 +93,6 @@ class analyzeState(state):
             # Gem best_target_pose på statemachine, så moveState kan bruge det
             self.stateMachine.target_pose = best_target_pose
             self.stateMachine.target_depot = target_depot
-            print("Skifter til moveState med target_pose. og target_depot")
             self.stateMachine.changeState(moveState())
         else:
             print("Ingen objekt fundet. eller intet target depot")
