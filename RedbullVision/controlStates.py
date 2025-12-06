@@ -6,9 +6,11 @@ import camPipeline
 import threading
 startStream = False
 class idleState(state):
+    def Enter(self):
+        print("WE ARE NOW IN IDLESTATE ")
+        self.Run()
     def Run(self):
         global startStream
-
         if startStream == False:
             asyncCam = threading.Thread(name='image_capture', target=camPipeline.image_capture)
             asyncCam.start()
@@ -32,18 +34,28 @@ class moveState(state):
         self.Run()
 
     def Run(self):
-        # Hent target_pose fra statemachine (sat i analyzeState)
+        # Hent target_pose og alt de ander fra statemachine (sat i analyzeState)
         target_pose = self.stateMachine.target_pose
-        if target_pose is None:
-            print("moveState: ingen target_pose fundet – tilbage til idle.")
-            self.stateMachine.changeState(idleState())
-            return
-
+        target_depot = self.stateMachine.target_depot
+        home_pose = self.stateMachine.home_pose
+        fixed_height = True 
+        print("moveState: åbner gripper")
+        moveRobot.openGripper()
         print("moveState: bevæger mod target:", target_pose)
+        moveRobot.move_to_target(target_pose, fixed_height)
         moveRobot.move_to_target(target_pose)
-
+        print("moveState: bevæger mod home:", home_pose)
+        moveRobot.move_to_target(home_pose)
+        print("moveState: lukker gripper")
+        moveRobot.closeGripper()
+        print("moveState: bevæger mod depot:", target_depot)
+        moveRobot.move_to_target(target_depot)
+        print("moveState: åbner gripper")
+        moveRobot.openGripper()
+        print("moveState: bevæger mod home:", home_pose)
+        moveRobot.move_to_target(home_pose)
         # Når vi er færdige med at flytte, gå tilbage til idle
-        self.stateMachine.changeState(idleState())
+        self.stateMachine.changeState(analyzeState())
 
     def Exit(self):
         pass
@@ -64,23 +76,24 @@ class errorState(state):
 class analyzeState(state):
 
     def Enter(self):
-        self.best_target_pose = None
-        print("enter analyzeState:", self.best_target_pose)
+        print("enter analyzeState:")
         self.Run() 
 
     def Run(self):
         print("Running vision analysis...")
         # Call the new function in detectObject
-        self.best_target_pose = detectObject.run_detection()
-        print("best target pose from vision:", self.best_target_pose)
+        best_target_pose, target_depot = detectObject.run_detection()
+        print("best target pose from vision:", best_target_pose)
+        print("target depot from vision:", target_depot)
 
-        if self.best_target_pose:
+        if best_target_pose and target_depot:
             # Gem best_target_pose på statemachine, så moveState kan bruge det
-            self.stateMachine.target_pose = self.best_target_pose
-            print("Skifter til moveState med target_pose.")
+            self.stateMachine.target_pose = best_target_pose
+            self.stateMachine.target_depot = target_depot
+            print("Skifter til moveState med target_pose. og target_depot")
             self.stateMachine.changeState(moveState())
         else:
-            print("Ingen objekt fundet.")
+            print("Ingen objekt fundet. eller intet target depot")
             self.stateMachine.changeState(idleState())
         
 

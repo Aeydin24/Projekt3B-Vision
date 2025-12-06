@@ -21,11 +21,12 @@ class stateMachine:
 
     def __init__(self, state:state):
         self.target_pose = None
+        self.target_depot = None
+        self.home_pose = [-0.009, -0.30698, 0.2]
         self.state = state
         self.state.stateMachine = self
         
     def changeState(self, newstate:state):
-        self.previousState = self.__class__.__name__
         self.state = self.state.Exit()
         self.state = newstate
 

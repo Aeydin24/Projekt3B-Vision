@@ -2,22 +2,28 @@ import numpy as np
 redDepot = [-0.26125, -0.20881, 0.2]  
 greenDepot = [-0.37500, -0.34612, 0.2]  
 yellowDepot = [-0.398768, -0.8242, 0.2]  
-restDepot = [0.8, -0.5, 0.1] # depot for alt andet, Vi skal lige give den en position :)
+restDepot = [0.8, -0.5, 0.2] # depot for alt andet, Vi skal lige give den en position :)
 
 class productType:
-    def __init__(self, name, shape, priority, lower_color, upper_color, min_area, max_area, z_pick, depot_location):
-        self.name = name
-        self.shape = shape
-        self.priority = priority # lavere nummer = højere prioritet
-        # HSV-farver som numpy-arrays
-        self.lower_color = np.array(lower_color, dtype=np.uint8)
-        self.upper_color = np.array(upper_color, dtype=np.uint8)
-        self.min_area = min_area
-        self.max_area = max_area
-        # z-højde hvor vi vil samle objektet op (i meter)
-        self.z_pick = z_pick
-        self.depot_location = depot_location  # (x, y, z) koordinater for depot
+	def __init__(self, name, shape, priority, lower_color, upper_color, min_area, max_area, z_pick, depot_location):
+		self.name = name
+		self.shape = shape
+		self.priority = priority # lavere nummer = højere prioritet
+		# HSV-farver som numpy-arrays
+		self.lower_color = np.array(lower_color, dtype=np.uint8)
+		self.upper_color = np.array(upper_color, dtype=np.uint8)
+		self.min_area = min_area
+		self.max_area = max_area
+		# z-højde hvor vi vil samle objektet op (i meter)
+		self.z_pick = z_pick
+		self.depot_location = depot_location  # (x, y, z) koordinater for depot
 
+	def get_depot_location(self):
+		print(f"Getting depot location for {self.name}: {self.depot_location}")
+		return self.depot_location
+        
+
+    
 blue_box = productType(
 	name="blue_box",
 	shape="box",

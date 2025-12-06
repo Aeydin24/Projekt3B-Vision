@@ -91,8 +91,8 @@ def select_best_object(candidates, tcp_pose):
     for c in candidates:
         if c["product"].priority == best_priority:
             top_candidates.append(c)     
-        if len(top_candidates) == 1:
-            return top_candidates[0]
+        #if len(top_candidates) == 1:
+            #return top_candidates[0]
     
     # If multiple with same priority, find closest to TCP
     tcp_x, tcp_y = tcp_pose[0], tcp_pose[1]
@@ -112,19 +112,22 @@ def select_best_object(candidates, tcp_pose):
 def get_target_pose(best_candidate, current_tcp_pose):
     if best_candidate is None:
         return None
-
+    
     product = best_candidate["product"]
     x_w, y_w = best_candidate["world"]
-    
+    depot_location = product.get_depot_location()
     # Start with current pose to keep rotation if not specified
     target_pose = list(current_tcp_pose)
-    
+    target_depot = list(current_tcp_pose)
     # Update position
+    target_depot[0] = depot_location[0]
+    target_depot[1] = depot_location[1]
+    target_depot[2] = depot_location[2]
     target_pose[0] = x_w
     target_pose[1] = y_w
     target_pose[2] = product.z_pick
         
-    return target_pose
+    return target_pose, target_depot
 
 #note til mig selv over nej om rtde skal starte i en  funktion isteder for main
 #note til mig selv overvej om vi skal starte cam pipeline i en funktion is istedet for.
@@ -139,6 +142,7 @@ def run_detection():
     start_time = time.time()
     sampleTime = 5 
     best_target_pose = None
+    target_depot = None
     # Run detection for a limited time or until a good object is found
     while True:
         if not pipeline.isRunning():
@@ -154,9 +158,8 @@ def run_detection():
         
         candidates = detect_objects(frame, product_list)
         best_obj = select_best_object(candidates, tcp_pose)
-        
         # Calculate target pose
-        target_pose = get_target_pose(best_obj, tcp_pose)
+        target_pose, depot_pose = get_target_pose(best_obj, tcp_pose)
 
         # Visualization
         if best_obj:
@@ -169,6 +172,7 @@ def run_detection():
             if target_pose and time.time() - start_time < sampleTime:
                 print(f"Target Pose found: {target_pose}")
                 best_target_pose = target_pose
+                target_depot = depot_pose
                 # If we found a target, we can break early or keep looking for a better one
                 # For now, let's return the first valid one we find
                 break
@@ -177,7 +181,7 @@ def run_detection():
     # Stop pipeline if needed, or let it be handled by context manager if we used one
     # Since init_camera starts it but doesn't return a context manager, we might need to stop it manually if we want to be clean
     # But for now, let's just return the result
-    return best_target_pose
+    return best_target_pose, target_depot
 
 if __name__ == "__main__":
     run_detection()
