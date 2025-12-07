@@ -90,8 +90,6 @@ def select_best_object(candidates, tcp_pose):
     for c in candidates:
         if c["product"].priority == best_priority:
             top_candidates.append(c)     
-        #if len(top_candidates) == 1:
-            #return top_candidates[0]
     
     # If multiple with same priority, find closest to TCP
     tcp_x, tcp_y = tcp_pose[0], tcp_pose[1]
@@ -113,7 +111,8 @@ def get_target_pose(best_candidate, current_tcp_pose):
     
     product = best_candidate["product"]
     x_w, y_w = best_candidate["world"]
-    depot_location = product.get_depot_location()
+    depot_location = product.depot_location
+    
     # Start with current pose to keep rotation if not specified
     target_pose = list(current_tcp_pose)
     target_depot = list(current_tcp_pose)
@@ -146,7 +145,7 @@ def run_detection():
             break
 
         # Get current TCP pose
-        tcp_pose = getCurrentPose
+        tcp_pose = getCurrentPose()
         candidates = detect_objects(frame, product_list)
         best_obj = select_best_object(candidates, tcp_pose)
         # Calculate target pose

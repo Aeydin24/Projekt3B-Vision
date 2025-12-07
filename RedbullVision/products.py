@@ -17,12 +17,6 @@ class productType:
 		# z-højde hvor vi vil samle objektet op (i meter)
 		self.z_pick = z_pick
 		self.depot_location = depot_location  # (x, y, z) koordinater for depot
-
-	def get_depot_location(self):
-		print(f"Getting depot location for {self.name}: {self.depot_location}")
-		return self.depot_location
-        
-
     
 blue_box = productType(
 	name="blue_box",
