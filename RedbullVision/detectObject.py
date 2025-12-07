@@ -95,7 +95,6 @@ def select_best_object(candidates, tcp_pose):
     
     # If multiple with same priority, find closest to TCP
     tcp_x, tcp_y = tcp_pose[0], tcp_pose[1]
-    
     best_candidate = None
     min_dist = float("inf")
     

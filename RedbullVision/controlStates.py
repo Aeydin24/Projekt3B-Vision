@@ -5,22 +5,21 @@ import moveRobot
 from camPipelineV3 import lorteFisseCameaPipeline
 import threading
 
+
+# note til mig selv gør så man kan skriv reboot så vi manualt kan reboot camPipeline tråden
 class idleState(state):
     def Enter(self):
         print("WE ARE NOW IN IDLESTATE")
-        self.Run()
-    def Run(self):
-
         if not lorteFisseCameaPipeline.initFlag:
-            print("Starting camera stream in idleState")
-            asyncCam = threading.Thread(name='display frame', target=lorteFisseCameaPipeline.display_frame)
-            asyncCam.start()
-            startStream = True        
-        userIn = input("Enter a command (start/move/vizmode):")
+            print("Starting camera pipeline thread")
+            threading.Thread(name='display frame', target=lorteFisseCameaPipeline.display_frame).start()        
+        self.Run()
+
+    def Run(self):
+  
+        userIn = input("Enter a command (start/vizmode):")
         if userIn == "start":
             self.stateMachine.changeState(analyzeState()) 
-        elif userIn == "move":
-            self.stateMachine.changeState(moveState())
         elif userIn == "vizmode":
             lorteFisseCameaPipeline.vizualize = not lorteFisseCameaPipeline.vizualize
             print(f"Vizualize mode set to: {lorteFisseCameaPipeline.vizualize}")
@@ -98,6 +97,8 @@ class analyzeState(state):
             print("Ingen objekt fundet. eller intet target depot")
             self.stateMachine.changeState(idleState())
         
+    def Exit(self):
+        pass
 
 if __name__ == "__main__":
     stateMachine(idleState()).run()
