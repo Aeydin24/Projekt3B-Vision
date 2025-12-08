@@ -34,7 +34,7 @@ def get_all_products():
 def detect_objects(frame, product_list):
     candidates = []
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    
+
     for prod in product_list:
         # Create mask
         mask = cv2.inRange(hsv, prod.lower_color, prod.upper_color)
@@ -123,7 +123,7 @@ def get_target_pose(best_candidate, current_tcp_pose):
     target_pose[0] = x_w
     target_pose[1] = y_w
     target_pose[2] = product.z_pick
-        
+            
     return target_pose, target_depot
 
 #note til mig selv over nej om rtde skal starte i en  funktion isteder for main

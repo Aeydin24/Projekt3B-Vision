@@ -29,7 +29,6 @@ def move_to_target(target_pose, fixed_height=False):
 #vi kan selv styre vores stop forxemple hvis vi bruger yolo til hånd så skal den stoppe hårdt, hvis det bare er normal stop så kan det være blødt
 def stop_movement(stopSpeed):
     try:
-        rtde_c = rtde_control.RTDEControlInterface(ROBOT_IP)
         rtde_c.stopL(stopSpeed)
         print("moveRobot: Movement stopped.")
     except Exception as e:
