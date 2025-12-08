@@ -98,6 +98,7 @@ def select_best_object(candidates, tcp_pose):
     
     for cand in top_candidates:
         wx, wy = cand["world"]
+        #euclidian formula beregner distance mellem to punkter
         dist = np.sqrt((wx - tcp_x)**2 + (wy - tcp_y)**2)
         if dist < min_dist:
             min_dist = dist
@@ -130,16 +131,17 @@ def get_target_pose(best_candidate, current_tcp_pose):
 #note til mig selv overvej om vi skal starte cam pipeline i en funktion is istedet for.
 def run_detection():
 
-    product_list = get_all_products()
+    product_list = get_all_products() #return en liste med alle produkter vi skal detektere
     start_time = time.time()
-    sampleTime = 5 
+    sampleTime = 2 
     best_target_pose = None
     target_depot = None
     # Run detection for a limited time or until a good object is found
     while True:
 
         frame = lorteFisseCameaPipeline.get_frame()
-        
+        # ADD  en liste for  første frame som vi kan perspektivere til sidste frame. i while loopet. for at gøre sample time mere effektivt. (Farlig)
+        # hvis postionere af objekter ikke har flytter sig cy og cx. inden for en margin der sat så kan vi køre efter sample time hvis ikke så reset timeren.
         if frame is None:
             print("Camera not initialized properly.")
             break

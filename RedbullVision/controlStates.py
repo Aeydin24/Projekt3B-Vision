@@ -23,6 +23,7 @@ class idleState(state):
         elif userIn == "vizmode":
             lorteFisseCameaPipeline.vizualize = not lorteFisseCameaPipeline.vizualize
             print(f"Vizualize mode set to: {lorteFisseCameaPipeline.vizualize}")
+            #note skal måske change to idle state again
         else:
             print("Invalid command")
             self.stateMachine.changeState(idleState())
@@ -82,7 +83,6 @@ class analyzeState(state):
         self.Run() 
 
     def Run(self):
-        print("Running vision analysis...")
         # Call the new function in detectObject
         best_target_pose, target_depot = detectObject.run_detection()
         print("best target pose from vision:", best_target_pose)

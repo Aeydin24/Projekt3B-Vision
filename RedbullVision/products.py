@@ -17,7 +17,7 @@ class productType:
 		# z-højde hvor vi vil samle objektet op (i meter)
 		self.z_pick = z_pick
 		self.depot_location = depot_location  # (x, y, z) koordinater for depot
-    
+
 blue_box = productType(
 	name="blue_box",
 	shape="box",
@@ -88,4 +88,16 @@ yellow_pill_glass = productType(
 	max_area=50000,
 	z_pick=0.10,
     depot_location=yellowDepot
+)
+
+pink_pill_glass = productType(
+	name="pink_pill_glass",
+	shape="circle",
+	priority=4,
+	lower_color=[145, 120, 120],
+	upper_color=[165, 255, 255],
+	min_area=300,
+	max_area=50000,
+	z_pick=0.10,
+	depot_location= redDepot
 )
