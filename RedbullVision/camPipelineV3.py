@@ -2,14 +2,12 @@ import depthai as dai
 import cv2
 import time
 
-class lorteFisseCameaPipeline:
-    def __init__(self, pipeline, videoQueue, initFlag, vizFrame, cam, videoIn, vizualize):
+class camPipeline:
+    def __init__(self, pipeline, videoQueue, initFlag, vizFrame, vizualize):
         self.pipeline = pipeline
         self.videoQueue = videoQueue
         self.initFlag = initFlag
         self.vizFrame = vizFrame
-        self.cam = cam
-        self.videoIn = videoIn
         self.vizualize = vizualize
 
     def init_camera(self):
@@ -60,6 +58,6 @@ class lorteFisseCameaPipeline:
         self.close_camera()
 
 if __name__ == "__main__":
-    lorteFisseCameaPipeline.init_camera()
+    camPipeline.init_camera(self)
 
     

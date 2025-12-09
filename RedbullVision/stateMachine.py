@@ -19,10 +19,8 @@ class state:
 
 class stateMachine:
 
+
     def __init__(self, state:state):
-        self.target_pose = None
-        self.target_depot = None
-        self.home_pose = [-0.009, -0.30698, 0.2]
         self.state = state
         self.state.stateMachine = self
         
@@ -39,3 +37,7 @@ class stateMachine:
         while self.running:
             self.state = self.state.Run()
 
+class stateValues:
+        target_pose = None
+        target_depot = None
+        home_pose = [-0.06, -0.285, 0.04, 3.14, 0, 0]

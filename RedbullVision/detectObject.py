@@ -3,7 +3,7 @@ import cv2
 import depthai as dai
 import numpy as np
 import products
-from camPipelineV3 import lorteFisseCameaPipeline
+from camPipelineV4 import camPipeline
 from moveRobot import getCurrentPose
 
 # load homography
@@ -23,18 +23,16 @@ def pixel_to_world(u: float, v: float):
 def get_all_products():
     # List of all product instances from products.py
     return [
-        products.blue_box,
-        products.green_box,
-        products.red_pill_glass,
+        products.blue_pill_glass,
         products.green_pill_glass,
-        products.black_pill_glass,
-        products.yellow_pill_glass
+        products.green_box,
+        products.black_pill_glass
     ]
 
 def detect_objects(frame, product_list):
     candidates = []
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
+    
     for prod in product_list:
         # Create mask
         mask = cv2.inRange(hsv, prod.lower_color, prod.upper_color)
@@ -43,7 +41,7 @@ def detect_objects(frame, product_list):
         kernel = np.ones((5, 5), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        
+        #  husk kims gausian blur
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         for cnt in contours:
@@ -108,7 +106,7 @@ def select_best_object(candidates, tcp_pose):
 
 def get_target_pose(best_candidate, current_tcp_pose):
     if best_candidate is None:
-        return None
+        return None, None
     
     product = best_candidate["product"]
     x_w, y_w = best_candidate["world"]
@@ -133,49 +131,47 @@ def run_detection():
 
     product_list = get_all_products() #return en liste med alle produkter vi skal detektere
     start_time = time.time()
-    sampleTime = 2 
+    sampleTime = 1
     best_target_pose = None
     target_depot = None
     # Run detection for a limited time or until a good object is found
-    while True:
+    while time.time() - start_time < sampleTime: 
 
-        frame = lorteFisseCameaPipeline.get_frame()
+        frame = camPipeline.get_frame()
         # ADD  en liste for  første frame som vi kan perspektivere til sidste frame. i while loopet. for at gøre sample time mere effektivt. (Farlig)
         # hvis postionere af objekter ikke har flytter sig cy og cx. inden for en margin der sat så kan vi køre efter sample time hvis ikke så reset timeren.
         if frame is None:
             print("Camera not initialized properly.")
             break
-
-        # Get current TCP pose
-        tcp_pose = getCurrentPose()
-        candidates = detect_objects(frame, product_list)
-        best_obj = select_best_object(candidates, tcp_pose)
-        # Calculate target pose
-        target_pose, depot_pose = get_target_pose(best_obj, tcp_pose)
-
-        # Visualization
-        if best_obj:
-            cx, cy = best_obj["center"]
-            prod_name = best_obj["product"].name
-            cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
-            cv2.putText(frame, f"{prod_name}", (cx + 10, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv2.putText(frame, f"({cx}, {cy})", (cx + 10, cy + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            lorteFisseCameaPipeline.vizFrame = frame
-            
-            if target_pose and time.time() - start_time < sampleTime:
-                print(f"Target Pose found: {target_pose}")
+        else:
+            #roi = frame[150:350, 170:480]  # crop to 300x310
+            # Get current TCP pose
+            tcp_pose = getCurrentPose()
+            candidates = detect_objects(frame, product_list)
+            best_obj = select_best_object(candidates, tcp_pose)
+            # Calculate target pose
+            target_pose, depot_pose = get_target_pose(best_obj, tcp_pose)
+            # Visualization
+            if best_obj is not None:
+                cx, cy = best_obj["center"]
+                prod_name = best_obj["product"].name
+                cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
+                cv2.putText(frame, f"{prod_name}", (cx + 10, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                cv2.putText(frame, f"({cx}, {cy})", (cx + 10, cy + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 best_target_pose = target_pose
                 target_depot = depot_pose
-                # If we found a target, we can break early or keep looking for a better one
-                # For now, let's return the first valid one we find
-                break
-                
+            camPipeline.vizFrame = frame
+
+            # If we found a target, we can break early or keep looking for a better one
+            # For now, let's return the first valid one we find
+
     #cv2.destroyAllWindows()
     # Stop pipeline if needed, or let it be handled by context manager if we used one
     # Since init_camera starts it but doesn't return a context manager, we might need to stop it manually if we want to be clean
     # But for now, let's just return the result
-    return best_target_pose, target_depot
+    if best_target_pose is not None and target_depot is not None:
+        return best_target_pose, target_depot
+    else:
+        return None, None
 
-if __name__ == "__main__":
-    run_detection()
 
