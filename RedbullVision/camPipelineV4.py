@@ -45,26 +45,24 @@ class camPipeline:
             return None
         
 
-    def init_yolo():
-        DEVICE = 0 if torch.cuda.is_available() else 'cpu'
+    def get_yolo(frame, device):
         frame = camPipeline.get_frame()
         model = YOLO("yolo11n.pt")
-        yoloFrame = model(frame, device=DEVICE, verbose=False, classes=[0], conf=0.8)
-        person_detected = False
+        yoloFrame = model(frame, device=device, verbose=False, classes=[0], conf=0.8)
         for r in yoloFrame:
-            if len(r.boxes) > 0:   # YOLO detected something
-                person_detected = True
+            if len(r.boxes) > 0:
                 print("Person detected!")
-        if person_detected:
-            rtde_c.triggerProtectiveStop()
-            sm.changeState(errorState())
+                rtde_c.triggerProtectiveStop()
+                sm.changeState(errorState())
                 
         
     def display_frame():
         camPipeline.init_camera()
+        device = 0 if torch.cuda.is_available() else 'cpu'
+        print(f"Using device: {device}")
         while camPipeline.initFlag and camPipeline.pipeline.isRunning():
-            camPipeline.init_yolo()
             normalFrame = camPipeline.get_frame()
+            camPipeline.get_yolo(normalFrame, device)
             if normalFrame is not None and not camPipeline.vizualize:
                 displayFrame = normalFrame
 
