@@ -8,9 +8,6 @@ import time
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
 # OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
 class idleState(State):
-    def Enter(self):
-        vs.init_camera()
-
     def Run(self):
         userIn = input("Enter a command (start/quit): ")
         if userIn == "quit":
@@ -25,27 +22,24 @@ class idleState(State):
 class analyzeState(State):
 
     def Run(self):
-
+        vs.init_camera()
         vs.detect_objects(vs.get_frame(), vs.get_all_products(), vs.getHomography())
-        time.sleep(2)
         vs.select_best_object(rc.getCurrentPose())
-        time.sleep(2)
         vs.get_target_pose(rc.getCurrentPose())
-        time.sleep(2)
         sm.changeState(moveState())
 
 class moveState(State):
     def Run(self):
-
+        rc.moveRobot(rc.home_pose, rc.getCurrentPose())
         rc.openGripper()
         rc.moveRobot(vs.target_pose, rc.getCurrentPose())
-        rc.toleranceCheck(vs.target_pose, rc.getCurrentPose())
         rc.closeGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
 
         rc.moveRobot(vs.target_depot, rc.getCurrentPose())
         rc.openGripper()
+
         sm.changeState(idleState())
 
 class errorState(State):

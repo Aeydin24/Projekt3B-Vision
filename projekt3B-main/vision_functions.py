@@ -178,7 +178,7 @@ class VisionSystem:
         # List of all product instances from products.py
         return [
             green_pill_glass,
-            red_pill_glass,
+            blue_pill_glass,
             yellow_pill_glass
         ]
 
@@ -196,16 +196,16 @@ class productType:
         self.z_pick = z_pick
         self.depot_location = depot_location
 
-red_pill_glass = productType(
+blue_pill_glass = productType(
     name="red_pill_glass",
     shape="circle",
     priority=2,
-    lower_color=[0, 148, 136],
-    upper_color=[10, 255, 255],
+    lower_color=[91, 148, 136],
+    upper_color=[111, 255, 255],
     min_area=300,
-    max_area=5000,
-    z_pick=0.12,
-    depot_location= [-0.26125, -0.20881, 0.12]
+    max_area=50000,
+    z_pick=0.09,
+    depot_location= [-0.21798, 0.001067, 0.2]
 )
 
 green_pill_glass = productType(
@@ -215,20 +215,20 @@ green_pill_glass = productType(
     lower_color=[38, 109, 109],
     upper_color=[58, 229, 229],
     min_area=300,
-    max_area=5000,
+    max_area=50000,
     z_pick=0.12,
-    depot_location=[-0.3500, -0.34612, 0.12]
+    depot_location=[-0.28627, 0.00845, 0.2]
 )
 
 yellow_pill_glass = productType(
     name="yellow_pill_glass",
     shape="circle",
-    priority=1,
+    priority=3,
     lower_color=[15, 120, 120],
     upper_color=[45, 255, 255],
     min_area=300,
-    max_area=5000,
-    z_pick=0.12,
-    depot_location=[-0.328768, -0.2242, 0.12]
+    max_area=50000,
+    z_pick=0.09,
+    depot_location=[-0.34390, -0.00825, 0.2]
 )
 

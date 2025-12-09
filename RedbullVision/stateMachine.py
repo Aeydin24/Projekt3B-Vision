@@ -3,7 +3,6 @@ class state:
     def Enter(self):
         self.stateMess = "Entering"
         print(f"Entering state: {self.__class__.__name__}")
-        self.Run()
         
     def Run(self):
         self.stateMess = "Running"
