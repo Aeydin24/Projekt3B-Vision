@@ -1,24 +1,15 @@
-import time
-
 import cv2
-import rtde_receive
-import rtde_control
-import rtde_io
-import vision_functions as vf
-import move_functions as mf
+
+from vision_functions import VisionSystem
+from move_functions import RobotController
 from StateMachine import StateMachine, State
-import numpy as np
-
-
-# Init af forbindelser til robot RTDE control & recieve interfaces
-robot_ip = "192.168.0.2"
-conn = rtde_control.RTDEControlInterface(robot_ip)
-connIO = rtde_io.RTDEIOInterface(robot_ip)
-rec_conn = rtde_receive.RTDEReceiveInterface(robot_ip)
+import time
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
 # OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
 class idleState(State):
+    def Enter(self):
+        vs.init_camera()
 
     def Run(self):
         userIn = input("Enter a command (start/quit): ")
@@ -32,39 +23,29 @@ class idleState(State):
 
 # analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
 class analyzeState(State):
+
     def Run(self):
-        frame = vf.create_bgr_pipeline()
-        try:
-            data = np.load("homography.npz")
-            H = data["H"]
-        except FileNotFoundError:
-            print("Theres no file called homography.npz")
-            sm.changeState(errorState())
-        z_fixed = 0.012
-        center_point = vf.find_red_center(frame)
-        sm.targetPose = vf.print_target_pose(center_point, z_fixed, H, rec_conn)
+
+        vs.detect_objects(vs.get_frame(), vs.get_all_products(), vs.getHomography())
+        time.sleep(2)
+        vs.select_best_object(rc.getCurrentPose())
+        time.sleep(2)
+        vs.get_target_pose(rc.getCurrentPose())
+        time.sleep(2)
         sm.changeState(moveState())
 
 class moveState(State):
     def Run(self):
 
-        mf.openGripper(connIO, rec_conn)
-        mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn, sm.targetPose)
-        mf.closeGripper(connIO, rec_conn)
+        rc.openGripper()
+        rc.moveRobot(vs.target_pose, rc.getCurrentPose())
+        rc.toleranceCheck(vs.target_pose, rc.getCurrentPose())
+        rc.closeGripper()
 
-        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.home)
-        mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn, sm.targetPose)
+        rc.moveRobot(rc.home_pose, rc.getCurrentPose())
 
-        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.redDepot)
-        mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn, sm.targetPose)
-        mf.openGripper(connIO, rec_conn)
-
-        sm.targetPose = mf.hard_coded_poses(rec_conn, sm.home)
-        mf.moveRobot(conn, sm.targetPose)
-        mf.toleranceCheck(rec_conn, sm.targetPose)
+        rc.moveRobot(vs.target_depot, rc.getCurrentPose())
+        rc.openGripper()
         sm.changeState(idleState())
 
 class errorState(State):
@@ -81,4 +62,6 @@ class errorState(State):
 
 if __name__ == "__main__":
     sm = StateMachine(idleState())
+    rc = RobotController()
+    vs = VisionSystem()
     sm.run()
