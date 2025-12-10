@@ -5,8 +5,7 @@ import rtde_receive
 import rtde_io
 
 class RobotController:
-    def __init__(self):
-        ROBOT_IP = '192.168.0.2'
+    def __init__(self, ROBOT_IP:str):
         self.controlConn = rtde_control.RTDEControlInterface(ROBOT_IP)
         self.recieveConn = rtde_receive.RTDEReceiveInterface(ROBOT_IP)
         self.IOConn = rtde_io.RTDEIOInterface(ROBOT_IP)
@@ -14,11 +13,15 @@ class RobotController:
 
     def moveRobot(self, targetPose, currentPose):
         try:
-            targetPose[3] = currentPose[3]
-            targetPose[4] = currentPose[4]
-            targetPose[5] = currentPose[5]
-            print(f"Command Move to: {targetPose} Sent to Robot")
-            self.controlConn.moveL(targetPose, 0.25, 0.5)  # her i moveL der sætter vi speed og accleartion
+            if not targetPose:
+                print("TargetPose is empty.")
+                self.controlConn.moveL(self.home_pose, 0.25, 0.5)
+            else:
+                targetPose[3] = currentPose[3]
+                targetPose[4] = currentPose[4]
+                targetPose[5] = currentPose[5]
+                print(f"Command Move to: {targetPose} Sent to Robot")
+                self.controlConn.moveL(targetPose, 0.25, 0.5)  # her i moveL der sætter vi speed og accleartion
         except TypeError:
             print("error in moveRobot function. targetPose is None.")
         except UnboundLocalError:
@@ -55,7 +58,6 @@ class RobotController:
                 if pos_dist < pos_tol:
                     print("Target position reached within tolerance.")
                     break
-                print("Moving to target position...")
                 print("Current:", pos_current, "Distance:", pos_dist)
                 time.sleep(1)
         except TypeError:

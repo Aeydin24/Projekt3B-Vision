@@ -1,9 +1,7 @@
-import cv2
-
+import time
 from vision_functions import VisionSystem
 from move_functions import RobotController
 from StateMachine import StateMachine, State
-import time
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
 # OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
@@ -20,27 +18,42 @@ class idleState(State):
 
 # analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
 class analyzeState(State):
-
     def Run(self):
+        vs.best_candidate = None
+        vs.target_pose = []
         vs.init_camera()
         vs.detect_objects(vs.get_frame(), vs.get_all_products(), vs.getHomography())
-        vs.select_best_object(rc.getCurrentPose())
+        vs.select_best_object_v2()
         vs.get_target_pose(rc.getCurrentPose())
-        sm.changeState(moveState())
+        if not vs.target_pose:
+            print("No objects found. Returning to idleState.")
+            sm.changeState(idleState())
+        else:
+            print("Objects found. Moving robot.")
+            sm.changeState(moveState())
+
 
 class moveState(State):
     def Run(self):
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
         rc.openGripper()
+
         rc.moveRobot(vs.target_pose, rc.getCurrentPose())
+        rc.toleranceCheck(vs.target_pose, rc.getCurrentPose())
         rc.closeGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
 
         rc.moveRobot(vs.target_depot, rc.getCurrentPose())
+        rc.toleranceCheck(vs.target_depot, rc.getCurrentPose())
         rc.openGripper()
 
-        sm.changeState(idleState())
+        rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
+
+        sm.changeState(analyzeState())
 
 class errorState(State):
 
@@ -56,6 +69,6 @@ class errorState(State):
 
 if __name__ == "__main__":
     sm = StateMachine(idleState())
-    rc = RobotController()
+    rc = RobotController("192.168.0.2")
     vs = VisionSystem()
     sm.run()

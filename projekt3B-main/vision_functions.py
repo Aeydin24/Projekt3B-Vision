@@ -2,17 +2,6 @@ import numpy as np
 import depthai as dai
 import time
 import cv2
-import numpy as np
-
-
-def get_all_products():
-    # List of all product instances from products.py
-    return [
-        green_pill_glass,
-        red_pill_glass,
-        yellow_pill_glass
-    ]
-
 
 class VisionSystem:
     def __init__(self):
@@ -34,7 +23,7 @@ class VisionSystem:
             self.cam = self.pipeline.create(dai.node.Camera).build()
             self.videoQueue = self.cam.requestOutput((640, 480)).createOutputQueue()
             self.pipeline.start()
-            time.sleep(2)
+            time.sleep(10)
             self.initFlag = True
             print("pipeline started")
         else:
@@ -101,7 +90,7 @@ class VisionSystem:
                 if prod.min_area < area < prod.max_area:
                     # Check shape
                     perimeter = cv2.arcLength(cnt, True)
-                    approx = cv2.approxPolyDP(cnt, 0.01 * perimeter, True)
+                    approx = cv2.approxPolyDP(cnt, 0.025 * perimeter, True)
                     shape_match = False
                     if prod.shape == "box":
                         # Box should have approx 4 vertices
@@ -116,7 +105,6 @@ class VisionSystem:
                         else:
                             print("no len match for shape: circle")
                     if shape_match:
-                        print("Made it to moments")
                         M = cv2.moments(cnt)
                         if M["m00"] != 0:
                             cx = int(M["m10"] / M["m00"])
@@ -133,7 +121,19 @@ class VisionSystem:
                                 print("No candidates were found.")
         return self.candidates
 
-    def select_best_object(self, tcp_pose):
+    def select_best_object_v2(self):
+        if not self.candidates:
+            return None
+        # Sort by priority (lower = better)
+        self.candidates.sort(key=lambda x: x["product"].priority)
+        self.best_candidate = None
+        # The first in the sorted list is the best candidate
+        self.best_candidate = self.candidates[0]
+        # Save the priority for reference
+        self.best_priority = self.best_candidate["product"].priority
+        return self.best_candidate
+
+    def select_best_object_deprecated(self, tcp_pose):
         if not self.candidates:
             return None
         # Sort by priority (lower is better)
@@ -179,6 +179,7 @@ class VisionSystem:
         return [
             green_pill_glass,
             blue_pill_glass,
+            pink_pill_glass,
             yellow_pill_glass
         ]
 
@@ -196,15 +197,15 @@ class productType:
         self.z_pick = z_pick
         self.depot_location = depot_location
 
-blue_pill_glass = productType(
-    name="red_pill_glass",
+pink_pill_glass = productType(
+    name="pink_pill_glass",
     shape="circle",
-    priority=2,
-    lower_color=[91, 148, 136],
-    upper_color=[111, 255, 255],
+    priority=4,
+    lower_color=[145, 120, 120],
+    upper_color=[165, 255, 255],
     min_area=300,
     max_area=50000,
-    z_pick=0.09,
+    z_pick=0.06,
     depot_location= [-0.21798, 0.001067, 0.2]
 )
 
@@ -212,23 +213,34 @@ green_pill_glass = productType(
     name="green_pill_glass",
     shape="circle",
     priority=1,
-    lower_color=[38, 109, 109],
-    upper_color=[58, 229, 229],
+    lower_color=[38, 99, 78],
+    upper_color=[58, 219, 198],
     min_area=300,
     max_area=50000,
-    z_pick=0.12,
-    depot_location=[-0.28627, 0.00845, 0.2]
+    z_pick=0.06,
+    depot_location=[-0.28627, 0.00845, 0.185]
 )
 
 yellow_pill_glass = productType(
     name="yellow_pill_glass",
     shape="circle",
-    priority=3,
-    lower_color=[15, 120, 120],
-    upper_color=[45, 255, 255],
+    priority=2,
+    lower_color=[14, 191, 151],
+    upper_color=[34, 255, 255],
     min_area=300,
     max_area=50000,
-    z_pick=0.09,
-    depot_location=[-0.34390, -0.00825, 0.2]
+    z_pick=0.06,
+    depot_location=[-0.34390, -0.00825, 0.185]
 )
 
+blue_pill_glass = productType(
+    name="blue_pill_glass",
+    shape="circle",
+    priority=3,
+    lower_color=[92, 172, 93],
+    upper_color=[112, 255, 213],
+    min_area=300,
+    max_area=50000,
+    z_pick=0.06,
+    depot_location=[-0.21798, 0.001067, 0.185]
+)
