@@ -4,7 +4,6 @@ from move_functions import RobotController
 from StateMachine import StateMachine, State
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
-# OBS: SKAL UDBYGGES - MÅSKE LILLE START/STOP GUI?
 class idleState(State):
     def Run(self):
         userIn = input("Enter a command (start/quit): ")
@@ -17,6 +16,9 @@ class idleState(State):
             sm.changeState(idleState())
 
 # analyseState er hvor behandling af koordinatsystemer og billedbehandling via contours foregår.
+# Generelt massiv mangel på errorhandling i dette program desværre.
+# Fokus har været på at åbne et funktionelt program, men vi har desværre brugt tiden for dårligt til at kunne inkludere gennemgående errorhandling.
+
 class analyzeState(State):
     def Run(self):
         vs.best_candidate = None
@@ -32,26 +34,26 @@ class analyzeState(State):
             print("Objects found. Moving robot.")
             sm.changeState(moveState())
 
-
+# i moveState bevæger robotcellen sig. Der returneres til analyzeState efter sortering.
 class moveState(State):
     def Run(self):
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
-        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose)
         rc.openGripper()
 
         rc.moveRobot(vs.target_pose, rc.getCurrentPose())
-        rc.toleranceCheck(vs.target_pose, rc.getCurrentPose())
+        rc.toleranceCheck(vs.target_pose)
         rc.closeGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
-        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose)
 
         rc.moveRobot(vs.target_depot, rc.getCurrentPose())
-        rc.toleranceCheck(vs.target_depot, rc.getCurrentPose())
+        rc.toleranceCheck(vs.target_depot)
         rc.openGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
-        rc.toleranceCheck(rc.home_pose, rc.getCurrentPose())
+        rc.toleranceCheck(rc.home_pose)
 
         sm.changeState(analyzeState())
 

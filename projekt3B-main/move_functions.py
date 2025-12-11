@@ -11,6 +11,10 @@ class RobotController:
         self.IOConn = rtde_io.RTDEIOInterface(ROBOT_IP)
         self.home_pose = [-0.06, -0.285, 0.2, 3.14, 0, 0]
 
+    # Funktion til bevægelse af robotten. Der bruges her kun moveL.
+    # Hvis targetPose er tom, gå da til homePose.
+    # Der fanges her nogle errors, men det er nok ikke her, errorhandling skal ske, da vi ikke
+    # Kan returnere til errorState inde i funktionerne - dette skal ske fra main.
     def moveRobot(self, targetPose, currentPose):
         try:
             if not targetPose:
@@ -27,10 +31,12 @@ class RobotController:
         except UnboundLocalError:
             print("error in moveRobot function. targetPose referenced before assignment")
 
+    # Returnerer currentPose
     def getCurrentPose(self):
         currentPose = self.recieveConn.getActualTCPPose()
         return currentPose
 
+    # Simpel funktion til at gribe om objekter og kontrollere griberens nuværende status.
     def closeGripper(self):
         if not self.recieveConn.getDigitalOutState(16):
             self.IOConn.setToolDigitalOut(0, True)
@@ -38,6 +44,7 @@ class RobotController:
         else:
             print("Gripper is already closed!")
 
+    # Simpel funktion til at åbne griberen og kontrollere griberens nuværende status.
     def openGripper(self):
         if self.recieveConn.getDigitalOutState(16):
             self.IOConn.setToolDigitalOut(0, False)
@@ -45,12 +52,18 @@ class RobotController:
         else:
             print("Gripper is already open!")
 
-    def toleranceCheck(self, targetPose, currentPose):
+    # Funktion til at sikre, at robotten ikke fortsætter før den rammer targetPose.
+    # NB: Funktionen er fully BLOCKING uden mulighed for at komme ud, hvis robotten ikke rammer sin targetPose.
+    # Dette vides godt, men er kun blevet implementeret, da rtde_c's 'MoveL' pludseligt stoppede med at være blocking, selvom dette er default ifølge
+    # SDU Robotics' dokumentation.
+    # Der er desværre ikke tid til at lave funktionen om og samtidig sikre funktionalitet lige nu...
+    def toleranceCheck(self, targetPose):
         try:
-            # tolerance in meters
+            # Tolerance i meter
             pos_tol = 0.005  # 5 mm
             while True:
-                # only compare XYZ
+                currentPose = self.recieveConn.getActualTCPPose()
+                # Kun brug XYZ
                 pos_current = np.array(currentPose[:3])
                 pos_target = np.array(targetPose[:3])
                 # Euclidean distance
@@ -63,6 +76,7 @@ class RobotController:
         except TypeError:
             print("Error in toleranceCheck function. targetPose is None.")
 
+    # Simpel funktion til at tage hard-coded positioner.
     def hard_coded_poses(self, targetPose):
         x_w, y_w, z_w = targetPose
         tcp_pose = self.recieveConn.getActualTCPPose()

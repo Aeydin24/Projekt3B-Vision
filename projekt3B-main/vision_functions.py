@@ -16,6 +16,9 @@ class VisionSystem:
         self.target_pose = None
         self.target_depot = None
 
+    # Opstart af kamera pipeline.
+    # Lang sleep da kameraet ellers er meget overexposed.
+
     def init_camera(self):
         if not self.initFlag:
             print("setting up pipeline")
@@ -29,6 +32,7 @@ class VisionSystem:
         else:
             print("pipeline already running")
 
+    # Funktion til at stoppe pipeline. Bruges ikke pt.
     def close_camera_deprecated(self):
         self.pipeline.stop()
         self.initFlag = False
@@ -36,6 +40,7 @@ class VisionSystem:
         cv2.destroyAllWindows()
         print("pipeline stopped")
 
+    # Funktion til at hente en frame fra pipelinen.
     def get_frame(self):
         if self.initFlag and self.pipeline.isRunning():
             videoIn = self.videoQueue.get()
@@ -45,7 +50,7 @@ class VisionSystem:
             print("could not get frame")
             return None
 
-
+    # Funktion til at displaye en frame via cv2.imshow. Bruges ikke i det fuldendte program.
     def display_frame_deprecated(self):
         self.init_camera()
         displayFrame = None
@@ -56,6 +61,7 @@ class VisionSystem:
                 break
         self.close_camera()
 
+    # Funktion til kalkulation af world-coordinate ud fra pixelværdi. Tager homografi som parameter.
     def pixel_to_world(self, u: float, v: float, H):
         p = np.array([u, v, 1.0], dtype=np.float32)
         world = H @ p
@@ -64,6 +70,7 @@ class VisionSystem:
         world /= world[2]
         return float(world[0]), float(world[1])
 
+    # Funktion til at returnere homograpfi.
     def getHomography(self):
         try:
             data = np.load("homography.npz")
@@ -72,6 +79,8 @@ class VisionSystem:
             print("Theres no file called homography.npz")
             return None
         return H
+
+    # Funktion som kører hele vores vision-pipeline på en enkelt frame.
 
     def detect_objects(self, frame, product_list, homografi):
         self.candidates = []
@@ -121,6 +130,7 @@ class VisionSystem:
                                 print("No candidates were found.")
         return self.candidates
 
+    # sortering af mulige sorteringskandidater ud fra product prioritet.
     def select_best_object_v2(self):
         if not self.candidates:
             return None
@@ -133,6 +143,8 @@ class VisionSystem:
         self.best_priority = self.best_candidate["product"].priority
         return self.best_candidate
 
+    # Gammel funktion til sortering af mulige sorteringskanditater ud fra prioritet og hvad der er tæt på robottens TCP.
+    # Bruges ikke i det nuværende program.
     def select_best_object_deprecated(self, tcp_pose):
         if not self.candidates:
             return None
@@ -156,6 +168,7 @@ class VisionSystem:
                 self.best_candidate = cand
         return self.best_candidate
 
+    # Funktion til at finde target pose.
     def get_target_pose(self, tcp_pose):
         if self.best_candidate is None:
             return None, None
@@ -173,7 +186,7 @@ class VisionSystem:
         self.target_pose[1] = y_w
         self.target_pose[2] = product.z_pick
         return self.target_pose, self.target_depot
-
+    # Funktion der returnerer alle products.
     def get_all_products(self):
         # List of all product instances from products.py
         return [
