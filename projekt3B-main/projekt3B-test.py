@@ -38,21 +38,26 @@ class analyzeState(State):
 class moveState(State):
     def Run(self):
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        # Brug kun i tilfælde af, at moveRobot() ikke self-blocker.
         rc.toleranceCheck(rc.home_pose)
         rc.openGripper()
 
         rc.moveRobot(vs.target_pose, rc.getCurrentPose())
+        # Brug kun i tilfælde af, at moveRobot() ikke self-blocker.
         rc.toleranceCheck(vs.target_pose)
         rc.closeGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        # Brug kun i tilfælde af, at moveRobot() ikke self-blocker.
         rc.toleranceCheck(rc.home_pose)
 
         rc.moveRobot(vs.target_depot, rc.getCurrentPose())
+        # Brug kun i tilfælde af, at moveRobot() ikke self-blocker.
         rc.toleranceCheck(vs.target_depot)
         rc.openGripper()
 
         rc.moveRobot(rc.home_pose, rc.getCurrentPose())
+        # Brug kun i tilfælde af, at moveRobot() ikke self-blocker.
         rc.toleranceCheck(rc.home_pose)
 
         sm.changeState(analyzeState())
