@@ -56,7 +56,7 @@ class RobotController:
     # NB: Funktionen er fully BLOCKING uden mulighed for at komme ud, hvis robotten ikke rammer sin targetPose.
     # Dette vides godt, men er kun blevet implementeret, da rtde_c's 'MoveL' i perioder pludseligt stoppede med at være blocking, selvom dette er default ifølge
     # SDU Robotics' dokumentation.
-    # Funktionen kan derfor bruges, hvis ikke rdte_interfacet adlyder, som den gør nogle gange - men ikke altid....
+    # Funktionen kan derfor bruges, hvis ikke rdte_interfacet adlyder, som den gør nogle gange - men ikke altid.....
     def toleranceCheck(self, targetPose):
         try:
             # Tolerance i meter
