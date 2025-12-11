@@ -29,7 +29,7 @@ class VisionSystem:
         else:
             print("pipeline already running")
 
-    def close_camera(self):
+    def close_camera_deprecated(self):
         self.pipeline.stop()
         self.initFlag = False
         time.sleep(1)
@@ -46,7 +46,7 @@ class VisionSystem:
             return None
 
 
-    def display_frame(self):
+    def display_frame_deprecated(self):
         self.init_camera()
         displayFrame = None
         while self.initFlag and self.pipeline.isRunning():
