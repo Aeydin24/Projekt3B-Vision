@@ -62,6 +62,7 @@ class moveState(State):
 
         sm.changeState(analyzeState())
 
+    # Bruges ikke i nuværende implementation af programmet.
 class errorState(State):
 
     def Run(self):
