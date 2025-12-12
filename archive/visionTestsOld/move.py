@@ -2,7 +2,6 @@
 #Brug det her script til at flytte robotten til en lokation baseret på et rødt objekts position i billedet.
 import time
 import vision
-import numpy as np
 import rtde_control
 
 ROBOT_IP = "192.168.0.2"

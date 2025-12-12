@@ -1,4 +1,3 @@
-import cv2
 from stateMachine import stateMachine, state, stateValues
 import detectObject
 import moveRobot

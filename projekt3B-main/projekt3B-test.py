@@ -1,6 +1,6 @@
 import time
-from vision_functions import VisionSystem
-from move_functions import RobotController
+from Vision_System import VisionSystem
+from Robot_Controller import RobotController
 from StateMachine import StateMachine, State
 
 # idleState fungerer som en menu, hvor brugeren af programmet kan starte og stoppe programflowet.
